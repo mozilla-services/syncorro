@@ -37,11 +37,38 @@
 
 const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
 
-Cu.import("resource://services-sync/main.js");
+Cu.import("resource://services-sync/status.js");
+Cu.import("resource://services-sync/service.js");
+Cu.import("resource://services-sync/constants.js");
+Cu.import("resource://services-sync/clients.js");
 Cu.import("resource://services-sync/log4moz.js");
 Cu.import("resource://services-sync/rest.js");
+Cu.import("resource://services-sync/util.js");
 
+Cu.import("resource://gre/modules/AddonManager.jsm");
+
+XPCOMUtils.defineLazyServiceGetter(this, "gUUIDService",
+                                   "@mozilla.org/uuid-generator;",
+                                   "nsIUUIDGenerator");
+
+XPCOMUtils.defineLazyGetter(this, "SyncorroPrefs", function () {
+  return new Preferences("extensions.syncorro.");
+});
+
+/**
+ * XXXXX
+ */
 const Syncorro = {
+
+  /**
+   * XXXXX
+   */
+  currentSession: null,
+
+  /**
+   * XXXXX
+   */
+  sessionStartedWithLogin: false,
 
   init: function init() {
     Services.obs.addObserver(this, "weave:service:sync:finish", false);
@@ -58,7 +85,160 @@ const Syncorro = {
   },
 
   observe: function observe(subject, topic, data) {
-    //TODO
+    switch (topic) {
+      case "weave:service:login:start":
+        this.currentSession = new SyncorroSession();
+        this.sessionStartedWithLogin = true;
+        return;
+
+      case "weave:service:sync:start":
+        if (this.sessionStartedWithLogin) {
+          this.sessionStartedWithLogin = false;
+          return;
+        }
+        //TODO if this.currentSession exists, something's wrong...
+        this.currentSession = new SyncorroSession();
+        return;
+
+      case "weave:engine:sync:applied":
+        if (subject.newFailed) {
+          //TODO track ze error
+        }
+        return;
+
+      case "weave:engine:sync:error":
+        this.currentSession.trackError(subject, data);
+        return;
+
+      case "weave:service:sync:finish":
+        if (Status.sync == STATUS_OK && !SyncorroPrefs.get("reportOnSuccess")) {
+          // Sync was successful. Nothing to see here.
+          this.resetSessionAndLog();
+          return;
+        }
+        // Fall through to error reporting
+      case "weave:service:login:error":
+      case "weave:service:sync:error":
+        let previousSession = this.currentSession;
+        let logStream = resetSessionAndLog();
+        if (subject) {
+          previousSession.trackError(subject, data);
+        }
+        if (previousSession.errors.length ||
+            SyncorroPrefs.get("reportOnSuccess")) {
+          this.saveAndSubmitReport(previousSession, logStream);
+        }
+        return;
+    }
+  },
+
+  /**
+   * Reset the Syncorro session and the in-memory log.
+   * 
+   * @return an nsIInputStream that contains the log output.
+   */
+  resetSessionAndLog: function resetSessionAndLog() {
+    let stream = this._appender.getInputStream();
+    this._appender.reset();
+    this.currentSession = null;
+    return stream;
+  },
+
+  /**
+   * XXXX
+   */
+  saveAndSubmitReport: function saveAndSubmitReport(session, logStream) {
+    session.generateReport(function (report) {
+      report.log = NetUtil.readInputStreamToString(logStream,
+                                                   logStream.available());
+
+      // Write the report to disk.
+      let file = FileUtils.getFile("ProfD",
+                                   ["weave", "syncorro", report.uuid + ".txt"]);
+      let outStream = FileUtils.openFileOutputStream(file);
+      let inStream = TODO; //XXX
+      NetUtil.asyncCopy(inStream, outStream, function () {
+        //TODO
+      });
+
+      // Upload the report to the server.
+      let uri = TODO; //XXX
+      let request = new RESTRequest(uri).put(report, function (error) {
+        //TODO
+      });
+    }.bind(this));
+  }
+
+};
+
+
+/**
+ * Session that tracks errors and other incidents during a sync.
+ * 
+ * We create one of these per sync.
+ */
+function SyncorroSession() {
+  this.uuid = gUUIDService.generateUUID().toString();
+  this.errors = [];
+}
+SyncorroSession.prototype = {
+
+  /**
+   * Track an error that occurred during a sync.
+   * 
+   * @param error
+   *        The error/exception object.
+   * @param engine [optional]
+   *        The engine that the error occurred in.
+   */
+  trackError: function trackError(error, engine) {
+    this.errors.push({
+      localTimestamp: Date.now(),
+      engine: engine,
+      error: error //TODO
+    });
+  },
+
+  _getEnabledAddonIDs: function _getEnabledAddonIDs(callback) {
+    AddonManager.getAllAddons(function (addons) {
+      let addon_ids = [];
+      for (let i = 0; i < addons.length; i++) {
+        let addon = addons[i];
+        if (addon.isActive) {
+          addon_ids.push(addon.id);
+        }
+      }
+      callback(addon_ids);
+    });
+  },
+
+  /**
+   * Generate a Syncorro report.
+   */
+  generateReport: function generateReport(callback) {
+    let clients_stats = Clients.stats;
+    this._getEnabledAddonIDs(function (addon_ids) {
+      callback({
+        id: this.uuid,
+        app: {
+          product: Services.appinfo.ID,
+          version: Services.appinfo.version,
+          buildID: Services.appinfo.platformBuildID,
+          locale: "en_US", //TODO
+          addons: addon_ids
+        },
+        sync: {
+          version: WEAVE_VERSION,
+          account: Service.username,
+          cluster: Service.clusterURL,
+          engines: [engine.name for each (engine in Engines.getEnabled())],
+          numClients: clients_stats.numClients,
+          hasMobile: clients_stats.hasMobile
+        },
+        errors: this.errors,
+        log: null  // this will be filled in by somebody else
+      });
+    }.bind(this));
   }
 
 };
