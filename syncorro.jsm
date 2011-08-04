@@ -126,7 +126,7 @@ const Syncorro = {
         }
         if (previousSession.errors.length ||
             SyncorroPrefs.get("reportOnSuccess")) {
-          this.saveAndSubmitReport(previousSession, logStream);
+          this.submitReport(previousSession, logStream);
         }
         return;
     }
@@ -147,27 +147,45 @@ const Syncorro = {
   /**
    * XXXX
    */
-  saveAndSubmitReport: function saveAndSubmitReport(session, logStream) {
+  submitReport: function submitReport(session, logStream, callback) {
     session.generateReport(function (report) {
       report.log = NetUtil.readInputStreamToString(logStream,
                                                    logStream.available());
 
-      // Write the report to disk.
-      let file = FileUtils.getFile("ProfD",
-                                   ["weave", "syncorro", report.uuid + ".txt"]);
-      let outStream = FileUtils.openFileOutputStream(file);
-      let inStream = TODO; //XXX
-      NetUtil.asyncCopy(inStream, outStream, function () {
-        //TODO
-      });
-
       // Upload the report to the server.
-      let uri = TODO; //XXX
+      let uri = SyncorroPrefs.get("serverURL") + report.uuid;
       let request = new RESTRequest(uri).put(report, function (error) {
-        //TODO
-      });
+        if (error) {
+          this._log.debug("Failed to upload report " + report.uuid +
+                          ". Got error: " + Utils.exceptionStr(error));
+        } else if (request.response.status != 200) {
+          this._log.debug("Failed to uplaod report " + report.uuid + 
+                          ". Got HTTP: " + request.response.status);
+          return this.saveReport(report, callback);
+        } else {
+          try {
+            report.response = JSON.stringify(request.response.body);
+          } catch (ex) {
+            this._log.debug("Server responded with invalid JSON: " +
+                            request.response.body);
+          }
+          // Yay, success!
+          report.submitted = true;
+        }
+        //TODO we might want a safety belt to ensure we save the report locally
+        // if the request times out...
+        this.saveReport(report, callback);
+      }.bind(this));
     }.bind(this));
-  }
+  },
+
+  saveReport: function saveReport(report, callback) {
+    // Write the report to disk.
+    Utils.jsonSave("syncorro/" + report.uuid, this, report, function () {
+      this._log.debug("Wrote report " + report.uuid);
+      callback();
+    });
+  },
 
 };
 

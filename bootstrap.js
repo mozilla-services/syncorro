@@ -42,6 +42,10 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 
 const RESOURCE_HOST = "syncorro";
+const DEFAULT_PREFS = {
+  "extensions.syncorro.reportOnSuccess": false,
+  "extensions.syncorro.serverURL": "http://localhost/syncorro/data/"
+};
 
 XPCOMUtils.defineLazyGetter(this, "gResProtocolHandler", function () {
   return Services.io.getProtocolHandler("resource")
