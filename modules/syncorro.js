@@ -37,9 +37,7 @@
 
 const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
 
-Cu.import("resource://services-sync/status.js");
-Cu.import("resource://services-sync/service.js");
-Cu.import("resource://services-sync/constants.js");
+Cu.import("resource://services-sync/main.js");
 Cu.import("resource://services-sync/log4moz.js");
 Cu.import("resource://services-sync/rest.js");
 Cu.import("resource://services-sync/util.js");
@@ -50,14 +48,13 @@ Cu.import("resource://gre/modules/AddonManager.jsm");
 
 const EXPORTED_SYMBOLS = ["Syncorro", "SyncorroPrefs", "SyncorroDefaultPrefs"];
 const PREF_BRANCH = "extensions.syncorro.";
+const SyncorroPrefs = new Preferences(PREF_BRANCH);
+const SyncorroDefaultPrefs = new Preferences({branch: PREF_BRANCH,
+                                              defaultBranch: true});
 
 XPCOMUtils.defineLazyServiceGetter(this, "gUUIDService",
                                    "@mozilla.org/uuid-generator;1",
                                    "nsIUUIDGenerator");
-
-const SyncorroPrefs = new Preferences(PREF_BRANCH);
-const SyncorroDefaultPrefs = new Preferences({branch: PREF_BRANCH,
-                                              defaultBranch: true});
 
 /**
  * Watch Sync for errors and other incidents and generate, save and upload
@@ -80,8 +77,17 @@ const Syncorro = {
   /**
    * Initialize. Call this once at startup.
    */
-  _log: Log4Moz.repository.getLogger("Sync.Syncorro"),
   init: function init() {
+    if (Weave.Status.ready) {
+      this._init();
+    } else {
+      Svc.Obs.add("weave:service:ready", this);
+    }
+  },
+
+  _log: Log4Moz.repository.getLogger("Sync.Syncorro"),
+
+  _init: function _init() {
     Svc.Obs.add("weave:service:sync:finish", this);
     Svc.Obs.add("weave:service:sync:error", this);
     Svc.Obs.add("weave:service:login:error", this);
@@ -112,6 +118,10 @@ const Syncorro = {
 
   observe: function observe(subject, topic, data) {
     switch (topic) {
+      case "weave:service:ready":
+        this._init();
+        return;
+
       case "weave:service:login:start":
         this.currentSession = new SyncorroSession();
         this.sessionStartedWithLogin = true;
@@ -137,7 +147,8 @@ const Syncorro = {
         return;
 
       case "weave:service:sync:finish":
-        if (Status.sync == STATUS_OK && !SyncorroPrefs.get("reportOnSuccess")) {
+        if (Weave.Status.sync == STATUS_OK &&
+            !SyncorroPrefs.get("reportOnSuccess")) {
           // Sync was successful. Nothing to see here.
           this.resetSessionAndLog();
           return;
@@ -277,9 +288,9 @@ SyncorroSession.prototype = {
           addons: addon_ids
         },
         sync: {
-          version: WEAVE_VERSION,
-          account: Service.username,
-          cluster: Service.clusterURL,
+          version: Weave.WEAVE_VERSION,
+          account: Weave.Service.username,
+          cluster: Weave.Service.clusterURL,
           engines: [engine.name for each (engine in Engines.getEnabled())],
           numClients: clients_stats.numClients,
           hasMobile: clients_stats.hasMobile
