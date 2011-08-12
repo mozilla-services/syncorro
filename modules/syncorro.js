@@ -88,6 +88,8 @@ const Syncorro = {
   _log: Log4Moz.repository.getLogger("Sync.Syncorro"),
 
   _init: function _init() {
+    Svc.Obs.add("weave:service:login:start", this);
+    Svc.Obs.add("weave:service:sync:start", this);
     Svc.Obs.add("weave:service:sync:finish", this);
     Svc.Obs.add("weave:service:sync:error", this);
     Svc.Obs.add("weave:service:login:error", this);
@@ -108,12 +110,18 @@ const Syncorro = {
    * Be a good restartless add-on and also support unload.
    */
   unload: function unload() {
-    Svc.Obs.remove("weave:service:sync:finish", this);
-    Svc.Obs.remove("weave:service:sync:error", this);
-    Svc.Obs.remove("weave:service:login:error", this);
+    Svc.Obs.remove("weave:service:ready", this);
 
-    let root = Log4Moz.repository.getLogger("Sync");
-    root.removeAppender(this._appender);
+    if (Weave.Status.ready) {
+      Svc.Obs.remove("weave:service:login:start", this);
+      Svc.Obs.remove("weave:service:sync:start", this);
+      Svc.Obs.remove("weave:service:sync:finish", this);
+      Svc.Obs.remove("weave:service:sync:error", this);
+      Svc.Obs.remove("weave:service:login:error", this);
+
+      let root = Log4Moz.repository.getLogger("Sync");
+      root.removeAppender(this._appender);
+    }
   },
 
   observe: function observe(subject, topic, data) {
@@ -150,16 +158,17 @@ const Syncorro = {
         return;
 
       case "weave:service:sync:finish":
-        if (Weave.Status.sync == STATUS_OK &&
+        if (Weave.Status.sync == Weave.STATUS_OK &&
             !SyncorroPrefs.get("reportOnSuccess")) {
           // Sync was successful. Nothing to see here.
-          this._log.trace("Successful sync, nothing to do.");
+          this._log.trace("Resetting session after a successful sync.");
           this.resetSessionAndLog();
           return;
         }
         // Fall through to error reporting
       case "weave:service:login:error":
       case "weave:service:sync:error":
+        this._log.trace("Resetting session, preparing to submit report.");
         let previousSession = this.currentSession;
         let logStream = this.resetSessionAndLog();
         if (subject) {
