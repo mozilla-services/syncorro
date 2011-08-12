@@ -80,6 +80,7 @@ const Syncorro = {
   /**
    * Initialize. Call this once at startup.
    */
+  _log: Log4Moz.repository.getLogger("Sync.Syncorro"),
   init: function init() {
     Svc.Obs.add("weave:service:sync:finish", this);
     Svc.Obs.add("weave:service:sync:error", this);
@@ -92,6 +93,8 @@ const Syncorro = {
     let root = Log4Moz.repository.getLogger("Sync");
     root.addAppender(appender);
     this._appender = appender;
+
+    this._log.level = Log4Moz.Level[Svc.Prefs.get("log.logger.service.main")];
   },
 
   /**
