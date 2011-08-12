@@ -123,16 +123,19 @@ const Syncorro = {
         return;
 
       case "weave:service:login:start":
+        this._log.trace("Starting a new session at login.");
         this.currentSession = new SyncorroSession();
         this.sessionStartedWithLogin = true;
         return;
 
       case "weave:service:sync:start":
         if (this.sessionStartedWithLogin) {
+          this._log.trace("Session already started at login.");
           this.sessionStartedWithLogin = false;
           return;
         }
         //TODO if this.currentSession exists, something's wrong...
+        this._log.trace("Starting a new session.");
         this.currentSession = new SyncorroSession();
         return;
 
@@ -150,6 +153,7 @@ const Syncorro = {
         if (Weave.Status.sync == STATUS_OK &&
             !SyncorroPrefs.get("reportOnSuccess")) {
           // Sync was successful. Nothing to see here.
+          this._log.trace("Successful sync, nothing to do.");
           this.resetSessionAndLog();
           return;
         }
@@ -163,9 +167,15 @@ const Syncorro = {
         }
         if (previousSession.errors.length ||
             SyncorroPrefs.get("reportOnSuccess")) {
+          this._log.trace("Submitting report " + report.uuid);
           this.submitReport(previousSession, logStream, function (report) {
             Svc.Obs.notify("syncorro:report:submitted", report);
-          });
+            //TODO we might want a safety belt to ensure we save the
+            // report locally if the request times out...
+            this.saveReport(report, function() {
+              Svc.Obs.notify("syncorro:report:saved", report);
+            });
+          }.bind(this));
         }
         return;
     }
@@ -200,7 +210,6 @@ const Syncorro = {
         } else if (request.response.status != 200) {
           this._log.debug("Failed to uplaod report " + report.uuid + 
                           ". Got HTTP: " + request.response.status);
-          return this.saveReport(report, callback);
         } else {
           try {
             report.response = JSON.stringify(request.response.body);
@@ -210,10 +219,9 @@ const Syncorro = {
           }
           // Yay, success!
           report.submitted = true;
+          this._log.debug("Report successfully submitted: " + report.uuid);
         }
-        //TODO we might want a safety belt to ensure we save the report locally
-        // if the request times out...
-        return this.saveReport(report, callback);
+        callback(report);
       }.bind(this));
     }.bind(this));
   },
@@ -224,7 +232,7 @@ const Syncorro = {
   saveReport: function saveReport(report, callback) {
     // Write the report to disk.
     Utils.jsonSave("syncorro/" + report.uuid, this, report, function () {
-      this._log.debug("Wrote report " + report.uuid);
+      this._log.debug("Saved report " + report.uuid);
       callback(report);
     });
   },
@@ -240,8 +248,11 @@ const Syncorro = {
 function SyncorroSession() {
   this.uuid = gUUIDService.generateUUID().toString().slice(1, -1);
   this.errors = [];
+  this._log.level = Log4Moz.Level[Svc.Prefs.get("log.logger.service.main")];
 }
 SyncorroSession.prototype = {
+
+  _log: Log4Moz.repository.getLogger("Sync.Syncorro"),
 
   /**
    * Track an error that occurred during a sync.
@@ -252,6 +263,7 @@ SyncorroSession.prototype = {
    *        The engine that the error occurred in.
    */
   trackError: function trackError(error, engine) {
+    this._log.trace("Tracking error: " + Utils.exceptionStr(error));
     this.errors.push({
       localTimestamp: Date.now(),
       engine: engine,
@@ -276,6 +288,7 @@ SyncorroSession.prototype = {
    * Generate a Syncorro report.
    */
   generateReport: function generateReport(callback) {
+    this._log.trace("Generating report...");
     let clients_stats = Clients.stats;
     this._getEnabledAddonIDs(function (addon_ids) {
       callback({
