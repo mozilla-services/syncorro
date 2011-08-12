@@ -58,7 +58,7 @@ function startup(data, reason) {
     let uri = addon.getResourceURI(".");
     gResProtocolHandler.setSubstitution(RESOURCE_HOST, uri);
 
-    Cu.import("resource://syncorro/syncorro.jsm");
+    Cu.import("resource://syncorro/modules/syncorro.js");
     for (let [name, value] in Iterator(DEFAULT_PREFS)) {
       SyncorroDefaultPrefs.set(name, value);
     }
@@ -71,7 +71,7 @@ function shutdown(data, reason) {
     return;
   }
 
-  Cu.import("resource://syncorro/syncorro.jsm");
+  Cu.import("resource://syncorro/modules/syncorro.js");
   Syncorro.unload();
   gResProtocolHandler.setSubstitution(RESOURCE_HOST, null);
 }
