@@ -44,7 +44,7 @@ Cu.import("resource://gre/modules/AddonManager.jsm");
 const RESOURCE_HOST = "syncorro";
 const DEFAULT_PREFS = {
   "extensions.syncorro.reportOnSuccess": false,
-  "extensions.syncorro.serverURL": "http://localhost/syncorro/data/"
+  "extensions.syncorro.serverURL": "http://localhost:9200/syncorro/report/"
 };
 
 XPCOMUtils.defineLazyGetter(this, "gResProtocolHandler", function () {
@@ -57,9 +57,21 @@ function startup(data, reason) {
     // Register the resource:// alias.
     let uri = addon.getResourceURI(".");
     gResProtocolHandler.setSubstitution(RESOURCE_HOST, uri);
+
+    Cu.import("resource://syncorro/syncorro.jsm");
+    for (let [name, value] in Iterator(DEFAULT_PREFS)) {
+      SyncorroDefaultPrefs.set(name, value);
+    }
+    Syncorro.init();
   });
 }
 
 function shutdown(data, reason) {
+  if (reason == APP_SHUTDOWN) {
+    return;
+  }
+
+  Cu.import("resource://syncorro/syncorro.jsm");
+  Syncorro.unload();
   gResProtocolHandler.setSubstitution(RESOURCE_HOST, null);
 }

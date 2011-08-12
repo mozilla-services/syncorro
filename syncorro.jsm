@@ -47,33 +47,46 @@ Cu.import("resource://services-sync/util.js");
 
 Cu.import("resource://gre/modules/AddonManager.jsm");
 
+const EXPORTED_SYMBOLS = ["Syncorro", "SyncorroPrefs", "SyncorroDefaultPrefs"];
+const PREF_BRANCH = "extensions.syncorro.";
+
 XPCOMUtils.defineLazyServiceGetter(this, "gUUIDService",
-                                   "@mozilla.org/uuid-generator;",
+                                   "@mozilla.org/uuid-generator;1",
                                    "nsIUUIDGenerator");
 
 XPCOMUtils.defineLazyGetter(this, "SyncorroPrefs", function () {
-  return new Preferences("extensions.syncorro.");
+  return new Preferences(PREF_BRANCH);
+});
+
+XPCOMUtils.defineLazyGetter(this, "SyncorroDefaultPrefs", function () {
+  return new Preferences({branch: PREF_BRANCH, defaultBranch: true});
 });
 
 /**
- * XXXXX
+ * Watch Sync for errors and other incidents and generate, save and upload
+ * reports.
  */
 const Syncorro = {
 
   /**
-   * XXXXX
+   * The current SyncorroSession object or null if there isn't a sync
+   * going on right now.
    */
   currentSession: null,
 
   /**
-   * XXXXX
+   * Flag to indicate whether the sync started with logging in or whether
+   * we were already logged in.
    */
   sessionStartedWithLogin: false,
 
+  /**
+   * Initialize. Call this once at startup.
+   */
   init: function init() {
-    Services.obs.addObserver(this, "weave:service:sync:finish", false);
-    Services.obs.addObserver(this, "weave:service:sync:error", false);
-    Services.obs.addObserver(this, "weave:service:login:error", false);
+    Svc.Obs.add("weave:service:sync:finish", this);
+    Svc.Obs.add("weave:service:sync:error", this);
+    Svc.Obs.add("weave:service:login:error", this);
 
     let formatter = new Log4Moz.BasicFormatter();
     let appender = new Log4Moz.StorageStreamAppender(formatter);
@@ -82,6 +95,18 @@ const Syncorro = {
     let root = Log4Moz.repository.getLogger("Sync");
     root.addAppender(appender);
     this._appender = appender;
+  },
+
+  /**
+   * Be a good restartless add-on and also support unload.
+   */
+  unload: function unload() {
+    Svc.Obs.remove("weave:service:sync:finish", this);
+    Svc.Obs.remove("weave:service:sync:error", this);
+    Svc.Obs.remove("weave:service:login:error", this);
+
+    let root = Log4Moz.repository.getLogger("Sync");
+    root.removeAppender(this._appender);
   },
 
   observe: function observe(subject, topic, data) {
@@ -126,7 +151,9 @@ const Syncorro = {
         }
         if (previousSession.errors.length ||
             SyncorroPrefs.get("reportOnSuccess")) {
-          this.submitReport(previousSession, logStream);
+          this.submitReport(previousSession, logStream, function (report) {
+            Svc.Obs.notify("syncorro:report:submitted", report);
+          });
         }
         return;
     }
@@ -145,7 +172,7 @@ const Syncorro = {
   },
 
   /**
-   * XXXX
+   * Submit report to server. Also saves report to disk.
    */
   submitReport: function submitReport(session, logStream, callback) {
     session.generateReport(function (report) {
@@ -174,16 +201,19 @@ const Syncorro = {
         }
         //TODO we might want a safety belt to ensure we save the report locally
         // if the request times out...
-        this.saveReport(report, callback);
+        return this.saveReport(report, callback);
       }.bind(this));
     }.bind(this));
   },
 
+  /**
+   * Save report to disk.
+   */
   saveReport: function saveReport(report, callback) {
     // Write the report to disk.
     Utils.jsonSave("syncorro/" + report.uuid, this, report, function () {
       this._log.debug("Wrote report " + report.uuid);
-      callback();
+      callback(report);
     });
   },
 
@@ -196,7 +226,7 @@ const Syncorro = {
  * We create one of these per sync.
  */
 function SyncorroSession() {
-  this.uuid = gUUIDService.generateUUID().toString();
+  this.uuid = gUUIDService.generateUUID().toString().slice(1, -1);
   this.errors = [];
 }
 SyncorroSession.prototype = {
@@ -213,7 +243,7 @@ SyncorroSession.prototype = {
     this.errors.push({
       localTimestamp: Date.now(),
       engine: engine,
-      error: error //TODO
+      error: error //TODO this might not stringify as well as we think it might
     });
   },
 
@@ -237,7 +267,7 @@ SyncorroSession.prototype = {
     let clients_stats = Clients.stats;
     this._getEnabledAddonIDs(function (addon_ids) {
       callback({
-        id: this.uuid,
+        uuid: this.uuid,
         app: {
           product: Services.appinfo.ID,
           version: Services.appinfo.version,
