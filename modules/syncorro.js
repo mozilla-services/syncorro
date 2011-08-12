@@ -95,6 +95,7 @@ const Syncorro = {
     this._appender = appender;
 
     this._log.level = Log4Moz.Level[Svc.Prefs.get("log.logger.service.main")];
+    this._log.info("Syncorro initialized.");
   },
 
   /**
@@ -145,7 +146,7 @@ const Syncorro = {
       case "weave:service:login:error":
       case "weave:service:sync:error":
         let previousSession = this.currentSession;
-        let logStream = resetSessionAndLog();
+        let logStream = this.resetSessionAndLog();
         if (subject) {
           previousSession.trackError(subject, data);
         }
