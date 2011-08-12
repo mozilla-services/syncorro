@@ -174,18 +174,19 @@ const Syncorro = {
         if (subject) {
           previousSession.trackError(subject, data);
         }
-        if (previousSession.errors.length ||
-            SyncorroPrefs.get("reportOnSuccess")) {
-          this._log.trace("Submitting report " + report.uuid);
-          this.submitReport(previousSession, logStream, function (report) {
-            Svc.Obs.notify("syncorro:report:submitted", report);
-            //TODO we might want a safety belt to ensure we save the
-            // report locally if the request times out...
-            this.saveReport(report, function() {
-              Svc.Obs.notify("syncorro:report:saved", report);
-            });
-          }.bind(this));
+        if (!previousSession.errors.length &&
+            !SyncorroPrefs.get("reportOnSuccess")) {
+          this._log.trace("No errors to report. Not submitting a report.");
+          return;
         }
+        this.submitReport(previousSession, logStream, function (report) {
+          Svc.Obs.notify("syncorro:report:submitted", report);
+          //TODO we might want a safety belt to ensure we save the
+          // report locally if the request times out...
+          this.saveReport(report, function() {
+            Svc.Obs.notify("syncorro:report:saved", report);
+          });
+        }.bind(this));
         return;
     }
   },
@@ -313,7 +314,7 @@ SyncorroSession.prototype = {
           version: Weave.WEAVE_VERSION,
           account: Weave.Service.username,
           cluster: Weave.Service.clusterURL,
-          engines: [engine.name for each (engine in Engines.getEnabled())],
+          engines: [eng.name for each (eng in Weave.Engines.getEnabled())],
           numClients: clients_stats.numClients,
           hasMobile: clients_stats.hasMobile
         },
