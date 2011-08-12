@@ -51,6 +51,7 @@ const PREF_BRANCH = "extensions.syncorro.";
 const SyncorroPrefs = new Preferences(PREF_BRANCH);
 const SyncorroDefaultPrefs = new Preferences({branch: PREF_BRANCH,
                                               defaultBranch: true});
+const ACCEPTED_SERVER_RESPONSES = [200, 201, 202];
 
 XPCOMUtils.defineLazyServiceGetter(this, "gUUIDService",
                                    "@mozilla.org/uuid-generator;1",
@@ -214,18 +215,19 @@ const Syncorro = {
       // Upload the report to the server.
       let uri = SyncorroPrefs.get("serverURL") + report.uuid;
       let request = new RESTRequest(uri).put(report, function (error) {
+        let response = request.response;
         if (error) {
           this._log.debug("Failed to upload report " + report.uuid +
                           ". Got error: " + Utils.exceptionStr(error));
-        } else if (request.response.status != 200) {
-          this._log.debug("Failed to uplaod report " + report.uuid + 
-                          ". Got HTTP: " + request.response.status);
+        } else if (ACCEPTED_SERVER_RESPONSES.indexOf(response.status) == -1) {
+          this._log.debug("Failed to upload report " + report.uuid + 
+                          ". Got HTTP: " + response.status);
         } else {
           try {
-            report.response = JSON.stringify(request.response.body);
+            report.response = JSON.stringify(response.body);
           } catch (ex) {
             this._log.debug("Server responded with invalid JSON: " +
-                            request.response.body);
+                            response.body);
           }
           // Yay, success!
           report.submitted = true;
