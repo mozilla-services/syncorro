@@ -40,10 +40,11 @@ const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
 Cu.import("resource://services-sync/status.js");
 Cu.import("resource://services-sync/service.js");
 Cu.import("resource://services-sync/constants.js");
-Cu.import("resource://services-sync/clients.js");
 Cu.import("resource://services-sync/log4moz.js");
 Cu.import("resource://services-sync/rest.js");
 Cu.import("resource://services-sync/util.js");
+Cu.import("resource://services-sync/engines/clients.js");
+Cu.import("resource://services-sync/ext/Preferences.js");
 
 Cu.import("resource://gre/modules/AddonManager.jsm");
 
@@ -54,13 +55,9 @@ XPCOMUtils.defineLazyServiceGetter(this, "gUUIDService",
                                    "@mozilla.org/uuid-generator;1",
                                    "nsIUUIDGenerator");
 
-XPCOMUtils.defineLazyGetter(this, "SyncorroPrefs", function () {
-  return new Preferences(PREF_BRANCH);
-});
-
-XPCOMUtils.defineLazyGetter(this, "SyncorroDefaultPrefs", function () {
-  return new Preferences({branch: PREF_BRANCH, defaultBranch: true});
-});
+const SyncorroPrefs = new Preferences(PREF_BRANCH);
+const SyncorroDefaultPrefs = new Preferences({branch: PREF_BRANCH,
+                                              defaultBranch: true});
 
 /**
  * Watch Sync for errors and other incidents and generate, save and upload
