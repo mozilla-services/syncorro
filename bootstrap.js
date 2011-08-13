@@ -63,6 +63,7 @@ function startup(data, reason) {
       SyncorroDefaultPrefs.set(name, value);
     }
     Syncorro.init();
+    AboutSyncorro.register();
   });
 }
 
@@ -72,6 +73,7 @@ function shutdown(data, reason) {
   }
 
   Cu.import("resource://syncorro/modules/syncorro.js");
+  AboutSyncorro.unload();
   Syncorro.unload();
   gResProtocolHandler.setSubstitution(RESOURCE_HOST, null);
 }

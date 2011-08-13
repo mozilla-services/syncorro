@@ -46,7 +46,8 @@ Cu.import("resource://services-sync/ext/Preferences.js");
 
 Cu.import("resource://gre/modules/AddonManager.jsm");
 
-const EXPORTED_SYMBOLS = ["Syncorro", "SyncorroPrefs", "SyncorroDefaultPrefs"];
+const EXPORTED_SYMBOLS = ["Syncorro", "SyncorroPrefs", "SyncorroDefaultPrefs",
+                          "AboutSyncorro"];
 const PREF_BRANCH = "extensions.syncorro.";
 const SyncorroPrefs = new Preferences(PREF_BRANCH);
 const SyncorroDefaultPrefs = new Preferences({branch: PREF_BRANCH,
@@ -326,4 +327,53 @@ SyncorroSession.prototype = {
     }.bind(this));
   }
 
+};
+
+
+const AboutSyncorro = {
+  classID: Components.ID("{781bc372-77a2-4772-a033-2668bf96fc6e}"),
+
+  QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule,
+                                         Ci.nsISupportsWeakReference]),
+
+  getURIFlags: function getURIFlags(aURI) {
+    return 0;
+  },
+
+  newChannel: function newChannel(aURI) {
+    let dir = FileUtils.getDir("ProfD", ["weave", "syncorro"], true);
+    let uri = Services.io.newFileURI(dir);
+    let channel = Services.io.newChannelFromURI(uri);
+    channel.originalURI = aURI;
+
+    // Ensure that the about page has the same privileges as a regular directory
+    // view. That way links to files can be opened.
+    let ssm = Cc["@mozilla.org/scriptsecuritymanager;1"]
+                .getService(Ci.nsIScriptSecurityManager);
+    let principal = ssm.getCodebasePrincipal(uri);
+    channel.owner = principal;
+    return channel;
+  },
+
+  // XPCOM crap
+
+  // nsIFactory
+  createInstance: function createInstance(outer, iid) {
+    if (outer != null) {
+      throw Cr.NS_ERROR_NO_AGGREGATION;
+    }
+    return this.QueryInterface(iid);
+  },
+
+  register: function register() {
+    let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
+    registrar.registerFactory(
+      this.classID, "AboutSyncorro",
+      "@mozilla.org/network/protocol/about;1?what=syncorro", this);
+  },
+
+  unload: function unload() {
+    let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
+    registrar.unregisterFactory(this.classID, this);
+  },
 };
