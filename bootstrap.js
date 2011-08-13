@@ -39,7 +39,6 @@ const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/AddonManager.jsm");
 
 const RESOURCE_HOST = "syncorro";
 const DEFAULT_PREFS = {
@@ -53,18 +52,15 @@ XPCOMUtils.defineLazyGetter(this, "gResProtocolHandler", function () {
 });
 
 function startup(data, reason) {
-  AddonManager.getAddonByID(data.id, function(addon) {
-    // Register the resource:// alias.
-    let uri = addon.getResourceURI(".");
-    gResProtocolHandler.setSubstitution(RESOURCE_HOST, uri);
+  // Register the resource:// alias.
+  gResProtocolHandler.setSubstitution(RESOURCE_HOST, data.resourceURI);
 
-    Cu.import("resource://syncorro/modules/syncorro.js");
-    for (let [name, value] in Iterator(DEFAULT_PREFS)) {
-      SyncorroDefaultPrefs.set(name, value);
-    }
-    Syncorro.init();
-    AboutSyncorro.register();
-  });
+  Cu.import("resource://syncorro/modules/syncorro.js");
+  for (let [name, value] in Iterator(DEFAULT_PREFS)) {
+    SyncorroDefaultPrefs.set(name, value);
+  }
+  Syncorro.init();
+  AboutSyncorro.register();
 }
 
 function shutdown(data, reason) {
