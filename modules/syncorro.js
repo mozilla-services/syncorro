@@ -250,6 +250,28 @@ const Syncorro = {
     });
   },
 
+  /**
+   * Fetches a list of saved reports from disk.
+   */
+  listSavedReports: function listSavedReports(callback) {
+    let dir = FileUtils.getDir("ProfD", ["weave", "syncorro"]);
+    let entries = dir.directoryEntries;
+    let reports = [];
+    while (entries.hasMoreElements()) {
+      let file = entries.getNext().QueryInterface(Ci.nsIFile);
+      let leaf = file.leafName;
+      if (leaf.slice(-5) == ".json") {
+        reports.push({
+          id: leaf.slice(0, -5),
+          date: file.lastModifiedTime,
+        });
+      }
+    }
+    callback(reports.sort(function (a, b) {
+      return a.date - b.date;
+    }));
+  },
+
 };
 
 
@@ -341,17 +363,10 @@ const AboutSyncorro = {
   },
 
   newChannel: function newChannel(aURI) {
-    let dir = FileUtils.getDir("ProfD", ["weave", "syncorro"], true);
-    let uri = Services.io.newFileURI(dir);
+    let uri = Services.io.newURI("chrome://syncorro/content/aboutSyncorro.xhtml",
+                                 null, null);
     let channel = Services.io.newChannelFromURI(uri);
     channel.originalURI = aURI;
-
-    // Ensure that the about page has the same privileges as a regular directory
-    // view. That way links to files can be opened.
-    let ssm = Cc["@mozilla.org/scriptsecuritymanager;1"]
-                .getService(Ci.nsIScriptSecurityManager);
-    let principal = ssm.getCodebasePrincipal(uri);
-    channel.owner = principal;
     return channel;
   },
 
