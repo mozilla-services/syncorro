@@ -109,8 +109,9 @@ td:last-child {
         onclick="AboutSyncorro.clearReports()">Remove All Reports</button>
 
 <h1>Sync Error Reports</h1>
-<div id="reportList">
-  <table>
+
+<div id="reportList" style="/*display: none*/">
+  <table id="reportTable">
     <thead>
       <tr>
         <th chromedir="&locale.dir;">Reports</th>
@@ -118,11 +119,30 @@ td:last-child {
       </tr>
     </thead>
     <tbody id="tbody">
-
     </tbody>
   </table>
 </div>
 <p id="noReports" style="display: none">Oh noez, there are no reportz.</p>
-<p id="noConfig" style="display: none">Syncorr is turned off.</p>
+<p id="noConfig" style="display: none">Syncorro is turned off.</p>
+
+<div id="reportView" style="/*display: none*/">
+
+<h2>Details for Sync problem on <span id="reportDate"></span></h2>
+
+<div id="reportNotSubmittedYet">
+<p>To help Mozilla improve Sync and prevent errors like this in the future, please submit this report. Your personal data will not be submitted.</p>
+
+<p><input type="checkbox" id="autoSubmit" value="true" checked="checked"/>
+<label for="autoSubmit">Automatically submit reports in the future</label></p>
+
+<button chromedir="&locale.dir;"
+        id="submit-report"
+        onclick="AboutSyncorro.submitReport();">Submit report</button>
+</div>
+
+<h3>Full report</h3>
+
+</div>
+
 </body>
 </html>

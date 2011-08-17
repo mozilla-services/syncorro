@@ -267,9 +267,14 @@ const Syncorro = {
         });
       }
     }
+    // Sort them by date, descending.
     callback(reports.sort(function (a, b) {
-      return a.date - b.date;
+      return b.date - a.date;
     }));
+  },
+
+  getReport: function getReport(uuid, callback) {
+    Utils.jsonLoad("syncorro/" + uuid, null, callback);
   },
 
 };

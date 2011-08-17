@@ -41,16 +41,37 @@ Cu.import("resource://syncorro/modules/syncorro.js");
 
 const AboutSyncorro = {
 
+  //TODO also need onhashchange
   init: function init() {
-    this.populateReportList();
+    window.addEventListener("hashchange", this.determineView.bind(this),
+                            false);
+    this.determineView();
   },
 
-  populateReportList: function populateReportList() {
+  determineView: function determineView() {
+    if (window.location.hash.length > 1) {
+      let uuid = window.location.hash.slice(1);
+      //TODO sanity check for uuid format?
+      this.showReport(uuid);
+    } else {
+      this.showReportList();
+    }
+  },
+
+  showReportList: function showReportList() {
     Syncorro.listSavedReports(function (reports) {
       let formatter = Cc["@mozilla.org/intl/scriptabledateformat;1"]
                         .createInstance(Ci.nsIScriptableDateFormat);
 
-      let body = document.getElementById("tbody");
+      document.getElementById("reportView").style.display = "none";
+
+      let table = document.getElementById("reportTable");
+      table.style.display = "block";
+
+      let tbody = document.getElementById("tbody");
+      table.removeChild(tbody);
+      tbody = document.createElement("tbody");
+      tbody.id = "tbody";
 
       for (let i = 0; i < reports.length; i++) {
         let report = reports[i];
@@ -58,10 +79,10 @@ const AboutSyncorro = {
         let cell = document.createElement("td");
         row.appendChild(cell);
         let link = document.createElement("a");
-        //TODO don't want to reload I think
+        link.id = report.id;
         link.setAttribute("href", "about:syncorro#" + report.id);
-        link.setAttribute("id", report.id);
-        link.appendChild(document.createTextNode(report.id));
+        //link.appendChild(document.createTextNode(report.id));
+        link.textContent = report.id;
         cell.appendChild(link);
 
         let date = new Date(report.date);
@@ -83,8 +104,24 @@ const AboutSyncorro = {
           date.getSeconds());
         cell.appendChild(document.createTextNode(timestr));
         row.appendChild(cell);
-        body.appendChild(row);
+        tbody.appendChild(row);
       }
+      table.appendChild(tbody);
+    });
+  },
+
+  showReport: function showReport(uuid) {
+    let table = document.getElementById("reportTable");
+    table.style.display = "none";
+
+    Syncorro.getReport(uuid, function (report) {
+      if (!report) {
+        // Uh-oh. Something went wrong.
+        alert("Oh noez, report not foundz.");//XXX TODO
+        return;
+      }
+
+      document.getElementById("reportView").style.display = "block";
     });
   },
 
