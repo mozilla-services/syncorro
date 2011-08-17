@@ -110,8 +110,8 @@ td:last-child {
 
 <h1>Sync Error Reports</h1>
 
-<div id="reportList" style="/*display: none*/">
-  <table id="reportTable">
+<div id="list.reports" style="/*display: none*/">
+  <table id="list.reports.table">
     <thead>
       <tr>
         <th chromedir="&locale.dir;">Reports</th>
@@ -121,26 +121,110 @@ td:last-child {
     <tbody id="tbody">
     </tbody>
   </table>
+<p id="list.reports.noReports" style="display: none">Oh noez, there are no reportz.</p>
+<p id="list.reports.noConfig" style="display: none">Syncorro is turned off.</p>
 </div>
-<p id="noReports" style="display: none">Oh noez, there are no reportz.</p>
-<p id="noConfig" style="display: none">Syncorro is turned off.</p>
 
-<div id="reportView" style="/*display: none*/">
+<div id="overview.report" style="/*display: none*/">
 
-<h2>Details for Sync problem on <span id="reportDate"></span></h2>
+<h2>Details for Sync problem on <span id="overview.report.date"/>
+<span id="overview.report.time"/></h2>
 
-<div id="reportNotSubmittedYet">
-<p>To help Mozilla improve Sync and prevent errors like this in the future, please submit this report. Your personal data will not be submitted.</p>
+<p id="overview.report.notSubmittedYet">To help Mozilla improve Sync
+and prevent errors like this in the future, please submit this
+report. Your personal data will not be submitted.</p>
 
-<p><input type="checkbox" id="autoSubmit" value="true" checked="checked"/>
-<label for="autoSubmit">Automatically submit reports in the future</label></p>
+<p id="overview.report.submitted">Firefox submitted a report of the
+problem to Mozilla.</p>
+
+<p id="overview.report.solutionFound">Good news! Firefox submitted a
+report of the problem to Mozilla and a possible solution was found.
+<a id="viewSupportPage" href="">View support page</a></p>
+
+<p>
+  <input type="checkbox"
+         id="overview.report.autoSubmit"
+         value="true"
+         checked="checked"/>
+  <label for="overview.report.autoSubmit">Automatically submit reports
+  in the future</label>
+</p>
 
 <button chromedir="&locale.dir;"
-        id="submit-report"
+        id="overview.report.submitButton"
         onclick="AboutSyncorro.submitReport();">Submit report</button>
+
+<h3 onclick="AboutSyncorro.toggle('reportFull')">Full report</h3>
+
+<div id="full.report">
+
+<p>Report ID: <span id="full.report.uuid"/></p>
+
+<h4 onclick="AboutSyncorro.toggle('full.report.app')">Application details</h4>
+
+<table id="full.report.app">
+  <tr>
+    <td>Application</td>
+    <td id="full.report.app.product"></td>
+  </tr>
+  <tr>
+    <td>Version</td>
+    <td id="full.report.app.version"></td>
+  </tr>
+  <tr>
+    <td>Build ID</td>
+    <td id="full.report.app.buildID"></td>
+  </tr>
+  <tr>
+    <td>Locale</td>
+    <td id="full.report.app.locale"></td>
+  </tr>
+  <tr>
+    <td>Add-ons</td>
+    <td id="full.report.app.addons"></td>
+  </tr>
+</table>
+
+<h4 onclick="AboutSyncorro.toggle('full.report.sync')">Sync account info</h4>
+
+<table id="full.report.sync">
+  <tr>
+    <td>Version</td>
+    <td id="full.report.sync.version"></td>
+  </tr>
+  <tr>
+    <td>Account</td>
+    <td id="full.report.sync.account"></td>
+  </tr>
+  <tr>
+    <td>Node</td>
+    <td id="full.report.sync.cluster"></td>
+  </tr>
+  <tr>
+    <td>Enabled engines</td>
+    <td id="full.report.sync.engines"></td>
+  </tr>
+  <tr>
+    <td>Number of engines</td>
+    <td id="full.report.sync.numClients"></td>
+  </tr>
+  <tr>
+    <td>Mobile clients</td>
+    <td id="full.report.sync.hasMobile"></td>
+  </tr>
+</table>
+
+<h4 onclick="AboutSyncorro.toggle('full.report.error')">Error fingerprint</h4>
+
+<div id="full.report.error">
 </div>
 
-<h3>Full report</h3>
+<h4 onclick="AboutSyncorro.toggle('full.report.log')">Log</h4>
+
+<pre id="full.report.log">
+</pre>
+
+</div>
 
 </div>
 

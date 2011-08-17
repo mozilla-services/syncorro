@@ -225,7 +225,7 @@ const Syncorro = {
                           ". Got HTTP: " + response.status);
         } else {
           try {
-            report.response = JSON.stringify(response.body);
+            report.response = JSON.parse(response.body);
           } catch (ex) {
             this._log.debug("Server responded with invalid JSON: " +
                             response.body);
@@ -274,7 +274,7 @@ const Syncorro = {
   },
 
   getReport: function getReport(uuid, callback) {
-    Utils.jsonLoad("syncorro/" + uuid, null, callback);
+    Utils.jsonLoad("syncorro/" + uuid, {}, callback);
   },
 
 };
@@ -333,6 +333,7 @@ SyncorroSession.prototype = {
     this._getEnabledAddonIDs(function (addon_ids) {
       callback({
         uuid: this.uuid,
+        timestamp: Date.now(),
         app: {
           product: Services.appinfo.ID,
           version: Services.appinfo.version,
@@ -349,7 +350,13 @@ SyncorroSession.prototype = {
           hasMobile: clients_stats.hasMobile
         },
         errors: this.errors,
-        log: null  // this will be filled in by somebody else
+
+        // This will be filled in by somebody else.
+        log: null,
+
+        // These will be set when the report is submitted successfully.
+        submitted: false,
+        response: null,
       });
     }.bind(this));
   }

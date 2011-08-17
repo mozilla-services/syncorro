@@ -37,7 +37,33 @@
 
 const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
 
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://syncorro/modules/syncorro.js");
+
+XPCOMUtils.defineLazyGetter(this, "gFormatter", function () {
+  return Cc["@mozilla.org/intl/scriptabledateformat;1"]
+           .createInstance(Ci.nsIScriptableDateFormat);
+});
+
+function formatDate(date) {
+  return gFormatter.FormatDate("",
+                               Ci.nsIScriptableDateFormat.dateFormatShort,
+                               date.getFullYear(),
+                               date.getMonth() + 1,
+                               date.getDate());
+}
+
+function formatTime(date) {
+  return gFormatter.FormatTime("",
+                               Ci.nsIScriptableDateFormat.timeFormatNoSeconds,
+                               date.getHours(),
+                               date.getMinutes(),
+                               date.getSeconds());
+}
+
+function setText(id, text) {
+  document.getElementById(id).textContent = text;
+}
 
 const AboutSyncorro = {
 
@@ -60,14 +86,11 @@ const AboutSyncorro = {
 
   showReportList: function showReportList() {
     Syncorro.listSavedReports(function (reports) {
-      let formatter = Cc["@mozilla.org/intl/scriptabledateformat;1"]
-                        .createInstance(Ci.nsIScriptableDateFormat);
 
-      document.getElementById("reportView").style.display = "none";
+      document.getElementById("overview.report").style.display = "none";
+      document.getElementById("list.reports").display = "block";
 
-      let table = document.getElementById("reportTable");
-      table.style.display = "block";
-
+      let table = document.getElementById("list.reports.table");
       let tbody = document.getElementById("tbody");
       table.removeChild(tbody);
       tbody = document.createElement("tbody");
@@ -87,22 +110,10 @@ const AboutSyncorro = {
 
         let date = new Date(report.date);
         cell = document.createElement("td");
-        let datestr = formatter.FormatDate(
-          "",
-          Ci.nsIScriptableDateFormat.dateFormatShort,
-          date.getFullYear(),
-          date.getMonth() + 1,
-          date.getDate());
-        cell.appendChild(document.createTextNode(datestr));
+        cell.textContent = formatDate(date);
         row.appendChild(cell);
         cell = document.createElement("td");
-        let timestr = formatter.FormatTime(
-          "",
-          Ci.nsIScriptableDateFormat.timeFormatNoSeconds,
-          date.getHours(),
-          date.getMinutes(),
-          date.getSeconds());
-        cell.appendChild(document.createTextNode(timestr));
+        cell.textContent = formatTime(date);
         row.appendChild(cell);
         tbody.appendChild(row);
       }
@@ -110,8 +121,12 @@ const AboutSyncorro = {
     });
   },
 
+  clearReports: function clearReports() {
+    //TODO
+  },
+
   showReport: function showReport(uuid) {
-    let table = document.getElementById("reportTable");
+    let table = document.getElementById("list.reports.table");
     table.style.display = "none";
 
     Syncorro.getReport(uuid, function (report) {
@@ -121,12 +136,33 @@ const AboutSyncorro = {
         return;
       }
 
-      document.getElementById("reportView").style.display = "block";
+      document.getElementById("overview.report").style.display = "block";
+
+      let date = new Date(report.timestamp);
+      setText("overview.report.date", formatDate(date));
+      setText("overview.report.date", formatTime(date));
+
+      setText("full.report.uuid", report.uuid);
+
+      setText("full.report.app.product", report.app.product);
+      setText("full.report.app.version", report.app.version);
+      setText("full.report.app.buildID", report.app.buildID);
+      setText("full.report.app.locale",  report.app.locale);
+      setText("full.report.app.addons",  report.app.addons); //TODO
+
+      setText("full.report.sync.version", report.sync.version);
+      setText("full.report.sync.account", report.sync.account);
+      setText("full.report.sync.cluster", report.sync.cluster);
+      setText("full.report.sync.numClients", report.sync.numClients);
+      setText("full.report.sync.hasMobile",  report.sync.hasMobile); //TODO
+
+      setText("full.report.error", JSON.stringify(report.error)); //TODO
+      setText("full.report.log", report.log);      
     });
   },
 
-  clearReports: function clearReports() {
+  toggle: function toggle(id) {
     //TODO
-  },
+  }
 
 };
