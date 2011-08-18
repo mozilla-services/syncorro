@@ -104,63 +104,68 @@ td:last-child {
 <script type="application/javascript;version=1.8"
         src="chrome://syncorro/content/aboutSyncorro.js"/>
 <body onload="AboutSyncorro.init()" dir="&locale.dir;">
+
+
+<div id="list.reports" style="/*display: none*/">
 <button chromedir="&locale.dir;"
         id="clear-reports"
         onclick="AboutSyncorro.clearReports()">Remove All Reports</button>
+<h1>Sync Reports</h1>
 
-<h1>Sync Error Reports</h1>
+<table id="list.reports.table">
+  <thead>
+    <tr>
+      <th chromedir="&locale.dir;">Reports</th>
+      <th chromedir="&locale.dir;" colspan="2">Date</th>
+    </tr>
+  </thead>
+  <tbody id="tbody">
+  </tbody>
+</table>
 
-<div id="list.reports" style="/*display: none*/">
-  <table id="list.reports.table">
-    <thead>
-      <tr>
-        <th chromedir="&locale.dir;">Reports</th>
-        <th chromedir="&locale.dir;" colspan="2">Date</th>
-      </tr>
-    </thead>
-    <tbody id="tbody">
-    </tbody>
-  </table>
-<p id="list.reports.noReports" style="display: none">Oh noez, there are no reportz.</p>
-<p id="list.reports.noConfig" style="display: none">Syncorro is turned off.</p>
+<p id="list.reports.noReports" style="display: none">Oh noez, there
+are no reportz.</p>
+
+<p id="list.reports.noConfig" style="display: none">Syncorro is turned
+off.</p>
 </div>
 
-<div id="overview.report" style="/*display: none*/">
+<div id="view.report" style="/*display: none*/">
 
-<h2>Details for Sync problem on <span id="overview.report.date"/>
-<span id="overview.report.time"/></h2>
+<h1>Details for Sync problem on <span id="view.report.date"/>
+<span id="view.report.time"/></h1>
 
-<p id="overview.report.notSubmittedYet">To help Mozilla improve Sync
+<p id="view.report.notSubmittedYet">To help Mozilla improve Sync
 and prevent errors like this in the future, please submit this
 report. Your personal data will not be submitted.</p>
 
-<p id="overview.report.submitted">Firefox submitted a report of the
+<p id="view.report.submitted">Firefox submitted a report of the
 problem to Mozilla.</p>
 
-<p id="overview.report.solutionFound">Good news! Firefox submitted a
+<p id="view.report.solutionFound">Good news! Firefox submitted a
 report of the problem to Mozilla and a possible solution was found.
 <a id="viewSupportPage" href="">View support page</a></p>
 
 <p>
   <input type="checkbox"
-         id="overview.report.autoSubmit"
+         id="view.report.autoSubmit"
          value="true"
          checked="checked"/>
-  <label for="overview.report.autoSubmit">Automatically submit reports
+  <label for="view.report.autoSubmit">Automatically submit reports
   in the future</label>
 </p>
 
 <button chromedir="&locale.dir;"
-        id="overview.report.submitButton"
+        id="view.report.submitButton"
         onclick="AboutSyncorro.submitReport();">Submit report</button>
 
-<h3 onclick="AboutSyncorro.toggle('reportFull')">Full report</h3>
+<h2 onclick="AboutSyncorro.toggle('reportFull')">Full report</h2>
 
 <div id="full.report">
 
 <p>Report ID: <span id="full.report.uuid"/></p>
 
-<h4 onclick="AboutSyncorro.toggle('full.report.app')">Application details</h4>
+<h3 onclick="AboutSyncorro.toggle('full.report.app')">Application details</h3>
 
 <table id="full.report.app">
   <tr>
@@ -185,7 +190,7 @@ report of the problem to Mozilla and a possible solution was found.
   </tr>
 </table>
 
-<h4 onclick="AboutSyncorro.toggle('full.report.sync')">Sync account info</h4>
+<h3 onclick="AboutSyncorro.toggle('full.report.sync')">Sync account info</h3>
 
 <table id="full.report.sync">
   <tr>
@@ -214,12 +219,12 @@ report of the problem to Mozilla and a possible solution was found.
   </tr>
 </table>
 
-<h4 onclick="AboutSyncorro.toggle('full.report.error')">Error fingerprint</h4>
+<h3 onclick="AboutSyncorro.toggle('full.report.error')">Error fingerprint</h3>
 
 <div id="full.report.error">
 </div>
 
-<h4 onclick="AboutSyncorro.toggle('full.report.log')">Log</h4>
+<h3 onclick="AboutSyncorro.toggle('full.report.log')">Log</h3>
 
 <pre id="full.report.log">
 </pre>

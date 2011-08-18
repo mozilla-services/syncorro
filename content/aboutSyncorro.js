@@ -86,8 +86,7 @@ const AboutSyncorro = {
 
   showReportList: function showReportList() {
     Syncorro.listSavedReports(function (reports) {
-
-      document.getElementById("overview.report").style.display = "none";
+      document.getElementById("view.report").style.display = "none";
       document.getElementById("list.reports").display = "block";
 
       let table = document.getElementById("list.reports.table");
@@ -126,9 +125,6 @@ const AboutSyncorro = {
   },
 
   showReport: function showReport(uuid) {
-    let table = document.getElementById("list.reports.table");
-    table.style.display = "none";
-
     Syncorro.getReport(uuid, function (report) {
       if (!report) {
         // Uh-oh. Something went wrong.
@@ -136,11 +132,9 @@ const AboutSyncorro = {
         return;
       }
 
-      document.getElementById("overview.report").style.display = "block";
-
       let date = new Date(report.timestamp);
-      setText("overview.report.date", formatDate(date));
-      setText("overview.report.date", formatTime(date));
+      setText("view.report.date", formatDate(date));
+      setText("view.report.date", formatTime(date));
 
       setText("full.report.uuid", report.uuid);
 
@@ -158,6 +152,9 @@ const AboutSyncorro = {
 
       setText("full.report.error", JSON.stringify(report.error)); //TODO
       setText("full.report.log", report.log);      
+
+      document.getElementById("list.reports").style.display = "none";
+      document.getElementById("view.report").style.display = "block";
     });
   },
 
