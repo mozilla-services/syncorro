@@ -38,13 +38,10 @@
 # ***** END LICENSE BLOCK *****
 -->
 
-<!DOCTYPE html [
-  <!ENTITY % htmlDTD
-    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "DTD/xhtml1-strict.dtd">
-  %htmlDTD;
-  <!ENTITY % globalDTD
-    SYSTEM "chrome://global/locale/global.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
+[
+  <!ENTITY % globalDTD SYSTEM "chrome://global/locale/global.dtd">
   %globalDTD;
 ]>
 
@@ -106,7 +103,7 @@ td:last-child {
 <body onload="AboutSyncorro.init()" dir="&locale.dir;">
 
 
-<div id="list.reports" style="/*display: none*/">
+<div id="list.reports">
 <button chromedir="&locale.dir;"
         id="clear-reports"
         onclick="AboutSyncorro.clearReports()">Remove All Reports</button>
@@ -123,14 +120,10 @@ td:last-child {
   </tbody>
 </table>
 
-<p id="list.reports.noReports" style="display: none">Oh noez, there
-are no reportz.</p>
-
-<p id="list.reports.noConfig" style="display: none">Syncorro is turned
-off.</p>
+<p id="list.reports.none">Oh noez, there are no reportz.</p>
 </div>
 
-<div id="view.report" style="/*display: none*/">
+<div id="view.report">
 
 <h1>Details for Sync problem on <span id="view.report.date"/>
 <span id="view.report.time"/></h1>

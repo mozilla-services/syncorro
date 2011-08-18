@@ -87,9 +87,18 @@ const AboutSyncorro = {
   showReportList: function showReportList() {
     Syncorro.listSavedReports(function (reports) {
       document.getElementById("view.report").style.display = "none";
-      document.getElementById("list.reports").display = "block";
+      document.getElementById("list.reports").style.display = "block";
 
       let table = document.getElementById("list.reports.table");
+      if (!reports.length) {
+        table.style.display = "none";
+        document.getElementById("list.reports.none").style.display = "block";
+        return;
+      }
+
+      document.getElementById("list.reports.none").style.display = "none";
+      table.style.display = "block";
+
       let tbody = document.getElementById("tbody");
       table.removeChild(tbody);
       tbody = document.createElement("tbody");
@@ -101,7 +110,7 @@ const AboutSyncorro = {
         let cell = document.createElement("td");
         row.appendChild(cell);
         let link = document.createElement("a");
-        link.id = report.id;
+        link.id = "report-" + report.id;
         link.setAttribute("href", "about:syncorro#" + report.id);
         //link.appendChild(document.createTextNode(report.id));
         link.textContent = report.id;
@@ -134,7 +143,7 @@ const AboutSyncorro = {
 
       let date = new Date(report.timestamp);
       setText("view.report.date", formatDate(date));
-      setText("view.report.date", formatTime(date));
+      setText("view.report.time", formatTime(date));
 
       setText("full.report.uuid", report.uuid);
 
