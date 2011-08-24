@@ -152,15 +152,15 @@ report of the problem to Mozilla and a possible solution was found.
         id="view.report.submitButton"
         onclick="AboutSyncorro.submitReport();">Submit report</button>
 
-<h2 onclick="AboutSyncorro.toggle('reportFull')">Full report</h2>
+<h2>Full report <a onclick="AboutSyncorro.toggle(this, 'full.report')">(show)</a></h2>
 
-<div id="full.report">
+<div id="full.report" style="display: none;">
 
 <p>Report ID: <span id="full.report.uuid"/></p>
 
-<h3 onclick="AboutSyncorro.toggle('full.report.app')">Application details</h3>
+<h3>Application details <a onclick="AboutSyncorro.toggle(this, 'full.report.app')">(show)</a></h3>
 
-<table id="full.report.app">
+<table id="full.report.app" style="display: none;">
   <tr>
     <td>Application</td>
     <td id="full.report.app.product"></td>
@@ -179,13 +179,16 @@ report of the problem to Mozilla and a possible solution was found.
   </tr>
   <tr>
     <td>Add-ons</td>
-    <td id="full.report.app.addons"></td>
+    <td id="full.report.app.addons">
+      <ul>
+      </ul>
+    </td>
   </tr>
 </table>
 
-<h3 onclick="AboutSyncorro.toggle('full.report.sync')">Sync account info</h3>
+<h3>Sync account info <a onclick="AboutSyncorro.toggle(this, 'full.report.sync')">(show)</a></h3>
 
-<table id="full.report.sync">
+<table id="full.report.sync" style="display: none;">
   <tr>
     <td>Version</td>
     <td id="full.report.sync.version"></td>
@@ -200,10 +203,12 @@ report of the problem to Mozilla and a possible solution was found.
   </tr>
   <tr>
     <td>Enabled engines</td>
-    <td id="full.report.sync.engines"></td>
+    <td id="full.report.sync.engines">
+      <ul></ul>
+    </td>
   </tr>
   <tr>
-    <td>Number of engines</td>
+    <td>Number of clients</td>
     <td id="full.report.sync.numClients"></td>
   </tr>
   <tr>
@@ -212,14 +217,14 @@ report of the problem to Mozilla and a possible solution was found.
   </tr>
 </table>
 
-<h3 onclick="AboutSyncorro.toggle('full.report.error')">Error fingerprint</h3>
+<h3>Error fingerprint <a onclick="AboutSyncorro.toggle(this, 'full.report.error')">(show)</a></h3>
 
-<div id="full.report.error">
+<div id="full.report.error" style="display: none;">
 </div>
 
-<h3 onclick="AboutSyncorro.toggle('full.report.log')">Log</h3>
+<h3>Log <a onclick="AboutSyncorro.toggle(this, 'full.report.log')">(show)</a></h3>
 
-<pre id="full.report.log">
+<pre id="full.report.log" style="display: none;">
 </pre>
 
 </div>

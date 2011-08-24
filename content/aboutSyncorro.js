@@ -65,6 +65,18 @@ function setText(id, text) {
   document.getElementById(id).textContent = text;
 }
 
+function setList(id, array) {
+  let cell = document.getElementById(id);
+  cell.removeChild(cell.firstChild);
+  let list = document.createElement("ul");
+  for (let i = 0; i < array.length; i++) {
+    let li = document.createElement("li");
+    li.textContent = array[i];
+    list.appendChild(li);
+  }
+  cell.appendChild(list);
+}
+
 function show(id, shouldShow) {
   document.getElementById(id).style.display = shouldShow ? "block" : "none";
 }
@@ -155,11 +167,12 @@ const AboutSyncorro = {
       setText("full.report.app.version", report.app.version);
       setText("full.report.app.buildID", report.app.buildID);
       setText("full.report.app.locale",  report.app.locale);
-      setText("full.report.app.addons",  report.app.addons); //TODO
+      setList("full.report.app.addons",  report.app.addons);
 
       setText("full.report.sync.version", report.sync.version);
       setText("full.report.sync.account", report.sync.account);
       setText("full.report.sync.cluster", report.sync.cluster);
+      setList("full.report.sync.engines", report.sync.engines);
       setText("full.report.sync.numClients", report.sync.numClients);
       setText("full.report.sync.hasMobile",  report.sync.hasMobile); //TODO
 
@@ -178,8 +191,16 @@ const AboutSyncorro = {
     });
   },
 
-  toggle: function toggle(id) {
-    //TODO
+  toggle: function toggle(button, id) {
+    let element = document.getElementById(id);
+if (!element) alert(id);
+    if (!element.style.display || element.style.display == "block") {
+      element.style.display = "none";
+      button.textContent = "(show)";
+    } else {
+      element.style.display = "block";
+      button.textContent = "(hide)";
+    }
   }
 
 };
