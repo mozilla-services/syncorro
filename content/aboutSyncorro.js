@@ -83,7 +83,6 @@ function show(id, shouldShow) {
 
 const AboutSyncorro = {
 
-  //TODO also need onhashchange
   init: function init() {
     window.addEventListener("hashchange", this.determineView.bind(this),
                             false);
@@ -193,7 +192,6 @@ const AboutSyncorro = {
 
   toggle: function toggle(button, id) {
     let element = document.getElementById(id);
-if (!element) alert(id);
     if (!element.style.display || element.style.display == "block") {
       element.style.display = "none";
       button.textContent = "(show)";
