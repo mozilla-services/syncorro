@@ -65,6 +65,10 @@ function setText(id, text) {
   document.getElementById(id).textContent = text;
 }
 
+function show(id, shouldShow) {
+  document.getElementById(id).style.display = shouldShow ? "block" : "none";
+}
+
 const AboutSyncorro = {
 
   //TODO also need onhashchange
@@ -86,19 +90,19 @@ const AboutSyncorro = {
 
   showReportList: function showReportList() {
     Syncorro.listSavedReports(function (reports) {
-      document.getElementById("view.report").style.display = "none";
-      document.getElementById("list.reports").style.display = "block";
+      show("view.report", false);
+      show("list.reports", true);
 
-      let table = document.getElementById("list.reports.table");
       if (!reports.length) {
-        table.style.display = "none";
-        document.getElementById("list.reports.none").style.display = "block";
+        show("list.reports.table", false);
+        show("list.reports.none", true);
         return;
       }
 
-      document.getElementById("list.reports.none").style.display = "none";
-      table.style.display = "block";
+      show("list.reports.table", true);
+      show("list.reports.none", false);
 
+      let table = document.getElementById("list.reports.table");
       let tbody = document.getElementById("tbody");
       table.removeChild(tbody);
       tbody = document.createElement("tbody");
@@ -162,8 +166,15 @@ const AboutSyncorro = {
       setText("full.report.error", JSON.stringify(report.error)); //TODO
       setText("full.report.log", report.log);      
 
-      document.getElementById("list.reports").style.display = "none";
-      document.getElementById("view.report").style.display = "block";
+      show("view.report.submitted", report.submitted);
+      show("view.report.notSubmittedYet", !report.submitted);
+      show("view.report.submitButton", !report.submitted);
+
+      //TODO
+      show("view.report.solutionFound", false);
+
+      show("list.reports", false);
+      show("view.report", true);
     });
   },
 
