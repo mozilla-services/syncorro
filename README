@@ -1,0 +1,41 @@
+Syncorro
+========
+
+What is it?
+-----------
+
+This addons prototypes automatic error reporting for Firefox Sync, including some of the related UI bits and pieces.
+
+Right now, it supports error reports being generated, saved to disk, and uploaded to an Elastic Search instance where they're indexed and can be queried. Some of the chrome tab UI is in place, but not all of it is hooked up and finalized. The related error notifications are missing for now.
+
+See https://wiki.mozilla.org/Services/Sync/FxSync/Syncorro for full details.
+
+How can I try it?
+-----------------
+
+1. Install Elastic Search on your local machine. This is as simple as downloading the latest version from http://elasticsearch.org, extracing the archive file, and running `bin/elasticsearch`.
+
+2. Install this add-on on a recent Firefox nightly. Best is to use a separate throw-away profile with a throw-away Sync account.
+
+3. Sync.
+
+4. Go to about:syncorro and view the reports. For now every sync creates and submits a report. The data you see here is what gets saved in your local Firefox profile.
+
+5. To query the Elastic Search server where the reports are submitted, you can use Elastic Search's JSON-based query language. Queries are submitted via HTTP.
+
+For instance, to query all reports that were submitted since a certain date and time, use the following command (with an appropriate value for the timestamp, of course):
+
+  curl -XGET 'http://localhost:9200/syncorro/report/_search' \
+       -d '{"query":{"range":{"timestamp":{"from": 1314145430231}}}}'
+
+To query based on the Sync version, enter this:
+
+  curl -XGET 'http://localhost:9200/syncorro/report/_search' \
+       -d '{"query":{"term":{"sync.version": "1.11.0"}}}'
+
+(These examples use the `curl` program which is a commonly available command-line HTTP client.)
+
+Where to send feedback?
+-----------------------
+
+Your feedback is most welcome. Please send it to services-dev@mozilla.org or philikon@mozilla.com.
