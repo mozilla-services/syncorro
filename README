@@ -10,6 +10,7 @@ Right now, it supports error reports being generated, saved to disk, and uploade
 
 See https://wiki.mozilla.org/Services/Sync/FxSync/Syncorro for full details.
 
+
 How can I try it?
 -----------------
 
@@ -34,6 +35,7 @@ To query based on the Sync version, enter this:
        -d '{"query":{"term":{"sync.version": "1.11.0"}}}'
 
 (These examples use the `curl` program which is a commonly available command-line HTTP client.)
+
 
 Where to send feedback?
 -----------------------
