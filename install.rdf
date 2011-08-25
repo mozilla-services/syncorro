@@ -6,7 +6,7 @@
     <em:bootstrap>true</em:bootstrap>
     <em:type>2</em:type>
     <em:name>Syncorro</em:name>
-    <em:version>1.0pre</em:version>
+    <em:version>1.0</em:version>
     <em:creator>Mozilla Foundation</em:creator>
     <em:contributor>Philipp von Weitershausen</em:contributor>
     <!-- Firefox -->
