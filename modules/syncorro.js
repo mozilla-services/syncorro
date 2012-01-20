@@ -255,8 +255,14 @@ const Syncorro = {
    */
   listSavedReports: function listSavedReports(callback) {
     let dir = FileUtils.getDir("ProfD", ["weave", "syncorro"]);
-    let entries = dir.directoryEntries;
     let reports = [];
+
+    if (!dir.exists()) {
+      callback(reports);  // no reports generated as of yet
+      return;
+    }
+
+    let entries = dir.directoryEntries;
     while (entries.hasMoreElements()) {
       let file = entries.getNext().QueryInterface(Ci.nsIFile);
       let leaf = file.leafName;
