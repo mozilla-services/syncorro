@@ -54,7 +54,10 @@ XPCOMUtils.defineLazyGetter(this, "gResProtocolHandler", function () {
 function startup(data, reason) {
   // Register the resource:// and chrome:// aliases.
   gResProtocolHandler.setSubstitution(RESOURCE_HOST, data.resourceURI);
-  Components.manager.addBootstrappedManifestLocation(data.installPath);
+
+  if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0) {
+    Components.manager.addBootstrappedManifestLocation(data.installPath);
+  }
 
   Cu.import("resource://syncorro/modules/syncorro.js");
   for (let [name, value] in Iterator(DEFAULT_PREFS)) {
@@ -72,6 +75,10 @@ function shutdown(data, reason) {
   Cu.import("resource://syncorro/modules/syncorro.js");
   AboutSyncorro.unload();
   Syncorro.unload();
-  Components.manager.removeBootstrappedManifestLocation(data.installPath);
+
+  if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0) {
+    Components.manager.removeBootstrappedManifestLocation(data.installPath);
+  }
+
   gResProtocolHandler.setSubstitution(RESOURCE_HOST, null);
 }
