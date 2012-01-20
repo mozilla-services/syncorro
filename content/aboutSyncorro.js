@@ -145,7 +145,13 @@ const AboutSyncorro = {
   },
 
   clearReports: function clearReports() {
-    //TODO
+    Syncorro.clearReports(function() {
+      show("view.report", false);
+      show("list.reports", true);
+
+      show("list.reports.table", false);
+      show("list.reports.none", true);
+    });
   },
 
   showReport: function showReport(uuid) {
@@ -176,7 +182,7 @@ const AboutSyncorro = {
       setText("full.report.sync.hasMobile",  report.sync.hasMobile); //TODO
 
       setText("full.report.error", JSON.stringify(report.error)); //TODO
-      setText("full.report.log", report.log);      
+      setText("full.report.log", report.log);
 
       show("view.report.submitted", report.submitted);
       show("view.report.notSubmittedYet", !report.submitted);

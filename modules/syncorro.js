@@ -283,6 +283,15 @@ const Syncorro = {
     Utils.jsonLoad("syncorro/" + uuid, {}, callback);
   },
 
+  clearReports: function clearReports(callback) {
+    let dir = FileUtils.getDir("ProfD", ["weave", "syncorro"]);
+    if (dir.exists()) {
+      dir.remove(true);
+    }
+
+    callback();
+  }
+
 };
 
 
