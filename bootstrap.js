@@ -72,7 +72,6 @@ function shutdown(data, reason) {
     return;
   }
 
-  Cu.import("resource://syncorro/modules/syncorro.js");
   AboutSyncorro.unload();
   Syncorro.unload();
 
@@ -80,5 +79,6 @@ function shutdown(data, reason) {
     Components.manager.removeBootstrappedManifestLocation(data.installPath);
   }
 
+  Cu.unload("resource://syncorro/modules/syncorro.js");
   gResProtocolHandler.setSubstitution(RESOURCE_HOST, null);
 }
