@@ -77,10 +77,6 @@ function setList(id, array) {
   cell.appendChild(list);
 }
 
-function show(id, shouldShow) {
-  document.getElementById(id).style.display = shouldShow ? "block" : "none";
-}
-
 const AboutSyncorro = {
 
   init: function init() {
@@ -101,19 +97,15 @@ const AboutSyncorro = {
 
   showReportList: function showReportList() {
     Syncorro.listSavedReports(function (reports) {
-      show("view.report", false);
-      show("list.reports", true);
+      document.body.classList.add('list-view');
 
       if (!reports.length) {
-        show("list.reports.table", false);
-        show("list.reports.none", true);
+        document.body.classList.add('no-reports');
         return;
       }
+      document.body.classList.remove('no-reports');
 
-      show("list.reports.table", true);
-      show("list.reports.none", false);
-
-      let table = document.getElementById("list.reports.table");
+      let table = document.getElementById("list-reports-table");
       let tbody = document.getElementById("tbody");
       table.removeChild(tbody);
       tbody = document.createElement("tbody");
@@ -146,11 +138,8 @@ const AboutSyncorro = {
 
   clearReports: function clearReports() {
     Syncorro.clearReports(function() {
-      show("view.report", false);
-      show("list.reports", true);
-
-      show("list.reports.table", false);
-      show("list.reports.none", true);
+      document.body.classList.add('list-view');
+      document.body.classList.add('no-reports');
     });
   },
 
@@ -158,52 +147,57 @@ const AboutSyncorro = {
     Syncorro.getReport(uuid, function (report) {
       if (!report) {
         // Uh-oh. Something went wrong.
-        alert("Oh noez, report not foundz.");//XXX TODO
+        document.body.classList.add('list-view');
+        document.body.classList.add('no-reports');
         return;
       }
 
+      document.body.classList.remove('list-view');
+
       let date = new Date(report.timestamp);
-      setText("view.report.date", formatDate(date));
-      setText("view.report.time", formatTime(date));
+      setText("view-report-date", formatDate(date));
+      setText("view-report-time", formatTime(date));
 
-      setText("full.report.uuid", report.uuid);
+      setText("full-report-uuid", report.uuid);
 
-      setText("full.report.app.product", report.app.product);
-      setText("full.report.app.version", report.app.version);
-      setText("full.report.app.buildID", report.app.buildID);
-      setText("full.report.app.locale",  report.app.locale);
-      setList("full.report.app.addons",  report.app.addons);
+      setText("full-report-app-product", report.app.product);
+      setText("full-report-app-version", report.app.version);
+      setText("full-report-app-buildID", report.app.buildID);
+      setText("full-report-app-locale",  report.app.locale);
+      setList("full-report-app-addons",  report.app.addons);
 
-      setText("full.report.sync.version", report.sync.version);
-      setText("full.report.sync.account", report.sync.account);
-      setText("full.report.sync.cluster", report.sync.cluster);
-      setList("full.report.sync.engines", report.sync.engines);
-      setText("full.report.sync.numClients", report.sync.numClients);
-      setText("full.report.sync.hasMobile",  report.sync.hasMobile); //TODO
+      setText("full-report-sync-version", report.sync.version);
+      setText("full-report-sync-account", report.sync.account);
+      setText("full-report-sync-cluster", report.sync.cluster);
+      setList("full-report-sync-engines", report.sync.engines);
+      setText("full-report-sync-numClients", report.sync.numClients);
+      setText("full-report-sync-hasMobile",  report.sync.hasMobile); //TODO
 
-      setText("full.report.error", JSON.stringify(report.error)); //TODO
-      setText("full.report.log", report.log);
+      setText("full-report-error", JSON.stringify(report.error)); //TODO
+      setText("full-report-log", report.log);
 
-      show("view.report.submitted", report.submitted);
-      show("view.report.notSubmittedYet", !report.submitted);
-      show("view.report.submitButton", !report.submitted);
+      if (report.submitted) {
+        document.getElementById("view-report").classList.add('report-submitted');
+      } else {
+        document.getElementById("view-report").classList.remove('report-submitted')
+      }
 
       //TODO
-      show("view.report.solutionFound", false);
-
-      show("list.reports", false);
-      show("view.report", true);
+      //show("view-report-solutionFound", false);
     });
   },
 
-  toggle: function toggle(button, id) {
-    let element = document.getElementById(id);
-    if (!element.style.display || element.style.display == "block") {
-      element.style.display = "none";
-      button.textContent = "(show)";
-    } else {
-      element.style.display = "block";
-      button.textContent = "(hide)";
+  details: function details(el) {
+    while (el) {
+      if (el.nodeName == 'details') {
+        if (el.hasAttribute('open')) {
+          el.removeAttribute('open');
+        } else {
+          el.setAttribute('open', '');
+        }
+        break;
+      }
+      el = el.parentNode;
     }
   }
 
