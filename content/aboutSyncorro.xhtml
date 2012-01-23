@@ -11,6 +11,8 @@
 [
   <!ENTITY % globalDTD SYSTEM "chrome://global/locale/global.dtd">
   %globalDTD;
+  <!ENTITY % syncorroDTD SYSTEM "chrome://syncorro/locale/syncorro.dtd" >
+  %syncorroDTD;
 ]>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -103,7 +105,7 @@
       }
     ]]>
     </style>
-    <title>Sync Error Reports</title>
+    <title>&title;</title>
 
     <link rel="stylesheet" media="screen, projection" type="text/css"
           href="chrome://global/skin/dirListing/dirListing.css"/>
@@ -115,76 +117,71 @@
     <div id="list-reports">
       <button chromedir="&locale.dir;"
               id="clear-reports"
-              onclick="AboutSyncorro.clearReports()">Remove All Reports</button>
-      <h1>Sync Reports</h1>
+              onclick="AboutSyncorro.clearReports()">&remove.all.reports;</button>
+      <h1>&sync.reports;</h1>
 
       <table id="list-reports-table">
         <thead>
           <tr>
-            <th chromedir="&locale.dir;">Name</th>
-            <th chromedir="&locale.dir;" colspan="2">Last Modified</th>
+            <th chromedir="&locale.dir;">&name;</th>
+            <th chromedir="&locale.dir;" colspan="2">&last.modified;</th>
           </tr>
         </thead>
         <tbody id="tbody">
         </tbody>
       </table>
 
-      <p id="list-reports-none">Oh noez, there are no reportz.</p>
+      <p id="list-reports-none">&no.reports.found;</p>
     </div>
 
     <div id="view-report">
-      <h1>Details for Sync problem on <span id="view-report-date"/> <span id="view-report-time"/></h1>
+      <h1>&view.report.details; <span id="view-report-date"/> <span id="view-report-time"/></h1>
 
-      <p id="view-report-notSubmittedYet">To help Mozilla improve Sync
-      and prevent errors like this in the future, please submit this
-      report. Your personal data will not be submitted.</p>
+      <p id="view-report-notSubmittedYet">&ask.to.submit;</p>
 
-      <p id="view-report-submitted">Firefox submitted a report of the
-      problem to Mozilla.</p>
+      <p id="view-report-submitted">&report.submitted;</p>
 
-      <!--<p id="view-report-solutionFound">Good news! Firefox submitted a
-      report of the problem to Mozilla and a possible solution was found.
-      <a id="viewSupportPage" href="">View support page</a></p>-->
+      <!--<p id="view-report-solutionFound">&solution.found;
+      <a id="viewSupportPage" href="">&view.support.page;</a></p>-->
 
       <p>
         <input type="checkbox"
                id="view-report-autoSubmit"
                value="true"
                checked="checked"/>
-        <label for="view-report-autoSubmit">Automatically submit reports
-        in the future</label>
+        <label for="view-report-autoSubmit">&auto.submit;</label>
       </p>
 
       <button chromedir="&locale.dir;"
               id="view-report-submitButton"
-              onclick="AboutSyncorro.submitReport();">Submit report</button>
+              onclick="AboutSyncorro.submitReport();">&submit.report;</button>
 
       <details>
-        <summary><h2 onclick="AboutSyncorro.details(this)">Full report <span class="details-closed">(show)</span><span class="details-open">(hide)</span></h2></summary>
+        <summary><h2 onclick="AboutSyncorro.details(this)">&full.report; <span class="details-closed">&show;</span><span class="details-open">&hide;</span></h2></summary>
         <div id="full-report">
-          <p>Report ID: <span id="full-report-uuid"/></p>
+          <p>&report.id; <span id="full-report-uuid"/></p>
 
           <details>
-            <summary><h3 onclick="AboutSyncorro.details(this)">Application details <span class="details-closed">(show)</span><span class="details-open">(hide)</span></h3></summary>
+            <summary><h3 onclick="AboutSyncorro.details(this)">&app.details; <span class="details-closed">&show;</span><span class="details-open">&hide;</span></h3></summary>
             <table id="full-report-app">
               <tr>
-                <td>Application</td>
+                <td>&application;</td>
                 <td id="full-report-app-product"></td>
               </tr>
               <tr>
-                <td>Version</td>
+                <td>&version;</td>
                 <td id="full-report-app-version"></td>
               </tr>
               <tr>
-                <td>Build ID</td>
+                <td>&build.id;</td>
                 <td id="full-report-app-buildID"></td>
               </tr>
               <tr>
-                <td>Locale</td>
+                <td>&locale;</td>
                 <td id="full-report-app-locale"></td>
               </tr>
               <tr>
-                <td>Add-ons</td>
+                <td>&addons;</td>
                 <td id="full-report-app-addons">
                   <ul>
                   </ul>
@@ -194,44 +191,44 @@
           </details>
 
           <details>
-            <summary><h3 onclick="AboutSyncorro.details(this)">Sync account info <span class="details-closed">(show)</span><span class="details-open">(hide)</span></h3></summary>
+            <summary><h3 onclick="AboutSyncorro.details(this)">&sync.account.info; <span class="details-closed">&show;</span><span class="details-open">&hide;</span></h3></summary>
             <table id="full-report-sync">
               <tr>
-                <td>Version</td>
+                <td>&version;</td>
                 <td id="full-report-sync-version"></td>
               </tr>
               <tr>
-                <td>Account</td>
+                <td>&account;</td>
                 <td id="full-report-sync-account"></td>
               </tr>
               <tr>
-                <td>Node</td>
+                <td>&node;</td>
                 <td id="full-report-sync-cluster"></td>
               </tr>
               <tr>
-                <td>Enabled engines</td>
+                <td>&enabled.engines;</td>
                 <td id="full-report-sync-engines">
                   <ul></ul>
                 </td>
               </tr>
               <tr>
-                <td>Number of clients</td>
+                <td>&no.of.clients;</td>
                 <td id="full-report-sync-numClients"></td>
               </tr>
               <tr>
-                <td>Mobile clients</td>
+                <td>&mobile.clients;</td>
                 <td id="full-report-sync-hasMobile"></td>
               </tr>
             </table>
           </details>
 
           <details>
-            <summary><h3 onclick="AboutSyncorro.details(this)">Error fingerprint <span class="details-closed">(show)</span><span class="details-open">(hide)</span></h3></summary>
+            <summary><h3 onclick="AboutSyncorro.details(this)">&error.fingerprint; <span class="details-closed">&show;</span><span class="details-open">&hide;</span></h3></summary>
             <div id="full-report-error"></div>
           </details>
 
           <details>
-            <summary><h3 onclick="AboutSyncorro.details(this)">Log <span class="details-closed">(show)</span><span class="details-open">(hide)</span></h3></summary>
+            <summary><h3 onclick="AboutSyncorro.details(this)">&log; <span class="details-closed">&show;</span><span class="details-open">&hide;</span></h3></summary>
             <pre id="full-report-log"></pre>
           </details>
         </div>
