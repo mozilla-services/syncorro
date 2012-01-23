@@ -146,7 +146,7 @@ const AboutSyncorro = {
       setText("full-report-sync-numClients", report.sync.numClients);
       setText("full-report-sync-hasMobile",  report.sync.hasMobile); //TODO
 
-      setText("full-report-error", JSON.stringify(report.error)); //TODO
+      setText("full-report-error", JSON.stringify(report.errors)); //TODO
       setText("full-report-log", report.log);
 
       if (report.submitted) {
