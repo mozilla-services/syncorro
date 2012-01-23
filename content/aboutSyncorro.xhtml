@@ -55,6 +55,10 @@
       table {
         padding-bottom: 2em;
       }
+      #view-report table {
+        margin: 0;
+        width: 60%;
+      }
       th {
         text-align: left;
         white-space: nowrap;
@@ -89,6 +93,10 @@
         float: left;
       }
 
+      #full-report-log {
+        overflow-x: scroll;
+      }
+
       .submitting {
         background-image: url(chrome://global/skin/icons/loading_16.png);
         background-repeat: no-repeat;
@@ -114,9 +122,13 @@
       details[open] > summary .details-closed {
         display: none;
       }
+      details[open] > * {
+        padding-left: 1em;
+      }
       details[open] > summary,
       details:not([open]) > summary {
         display: block;
+        padding-left: 0;
       }
       summary {
         cursor: pointer;
@@ -162,9 +174,9 @@
       <p id="view-report-submitted">Firefox submitted a report of the
       problem to Mozilla.</p>
 
-      <p id="view-report-solutionFound">Good news! Firefox submitted a
+      <!--<p id="view-report-solutionFound">Good news! Firefox submitted a
       report of the problem to Mozilla and a possible solution was found.
-      <a id="viewSupportPage" href="">View support page</a></p>
+      <a id="viewSupportPage" href="">View support page</a></p>-->
 
       <p>
         <input type="checkbox"
