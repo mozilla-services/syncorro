@@ -1,0 +1,33 @@
+<!ENTITY title                "Sync Error Reports">
+<!ENTITY remove.all.reports   "Remove All Reports">
+<!ENTITY sync.reports         "Sync Reports">
+<!ENTITY name                 "Name">
+<!ENTITY last.modified        "Last Modified">
+<!ENTITY no.reports.found     "Oh noez, there are no reportz.">
+<!ENTITY view.report.details  "Details for Sync problem on:">
+<!ENTITY ask.to.submit        "To help Mozilla improve Sync and prevent errors like this in the future, please submit this report. Your personal data will not be submitted.">
+<!ENTITY report.submitted     "Firefox submitted a report of the problem to Mozilla.">
+<!ENTITY solution.found       "Good news! Firefox submitted a report of the problem to Mozilla and a possible solution was found.">
+<!ENTITY view.support.page    "View support page">
+<!ENTITY auto.submit          "Automatically submit reports in the future">
+<!ENTITY submit.report        "Submit report">
+<!ENTITY full.report          "Full report">
+<!ENTITY show                 "(show)">
+<!ENTITY hide                 "(hide)">
+<!ENTITY report.id            "Report ID:">
+<!ENTITY app.details          "Application details">
+<!ENTITY application          "Application">
+<!ENTITY version              "Version">
+<!ENTITY build.id             "Build ID">
+<!ENTITY locale               "Locale">
+<!ENTITY addons               "Add-ons">
+<!ENTITY sync.account.info    "Sync account info">
+<!ENTITY version              "Version">
+<!ENTITY account              "Account">
+<!ENTITY node                 "Node">
+<!ENTITY enabled.engines      "Enabled engines">
+<!ENTITY no.of.clients        "Number of clients">
+<!ENTITY enabled.engines      "Enabled engines">
+<!ENTITY mobile.clients       "Mobile clients">
+<!ENTITY error.fingerprint    "Error fingerprint">
+<!ENTITY log                  "Log">

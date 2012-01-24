@@ -1,235 +1,153 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-# ***** BEGIN LICENSE BLOCK *****
-# Version: MPL 1.1/GPL 2.0/LGPL 2.1
-#
-# The contents of this file are subject to the Mozilla Public License Version
-# 1.1 (the "License"); you may not use this file except in compliance with
-# the License. You may obtain a copy of the License at
-# http://www.mozilla.org/MPL/
-#
-# Software distributed under the License is distributed on an "AS IS" basis,
-# WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
-# for the specific language governing rights and limitations under the
-# License.
-#
-# The Original Code is Syncorro.
-#
-# The Initial Developer of the Original Code is
-# the Mozilla Foundation.
-# Portions created by the Initial Developer are Copyright (C) 2011
-# the Initial Developer. All Rights Reserved.
-#
-# Contributor(s):
-#   Philipp von Weitershausen <philipp@weitershausen.de>
-#
-# Alternatively, the contents of this file may be used under the terms of
-# either the GNU General Public License Version 2 or later (the "GPL"), or
-# the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
-# in which case the provisions of the GPL or the LGPL are applicable instead
-# of those above. If you wish to allow use of your version of this file only
-# under the terms of either the GPL or the LGPL, and not to allow others to
-# use your version of this file under the terms of the MPL, indicate your
-# decision by deleting the provisions above and replace them with the notice
-# and other provisions required by the GPL or the LGPL. If you do not delete
-# the provisions above, a recipient may use your version of this file under
-# the terms of any one of the MPL, the GPL or the LGPL.
-#
-# ***** END LICENSE BLOCK *****
--->
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+   - You can obtain one at http://mozilla.org/MPL/2.0/.  
+   - Contributor(s):
+   -   Philipp von Weitershausen <philipp@weitershausen.de>
+   -   Mime Cuvalo <mime@mozilla.com> -->
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
 [
   <!ENTITY % globalDTD SYSTEM "chrome://global/locale/global.dtd">
   %globalDTD;
+  <!ENTITY % syncorroDTD SYSTEM "chrome://syncorro/locale/syncorro.dtd" >
+  %syncorroDTD;
 ]>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<style type="text/css">
-:root {
-  font-family: sans-serif;
-}
-table {
-  padding-bottom: 2em;
-}
-th {
-  text-align: left;
-  white-space: nowrap;
-}
-th[chromedir="rtl"] {
-  text-align: right;
-}
-/* name */
-th:first-child {
-  -moz-padding-end: 2em;
-}
-:link, :visited {
-  display: block;
-  min-height: 17px;
-}
-/* date */
-td:first-child + td {
-  -moz-padding-start: 1em;
-  -moz-padding-end: .5em;
-  white-space: nowrap;
-}
-/* time */
-td:last-child {
-  -moz-padding-start: .5em;
-  white-space: nowrap;
-}
+  <head>
+    <title>&title;</title>
 
-#clear-reports {
-  float: right;
-}
-#clear-reports[chromedir="rtl"] {
-  float: left;
-}
+    <link rel="stylesheet" media="screen, projection" type="text/css"
+          href="chrome://syncorro/skin/syncorro.css"/>
+    <link rel="stylesheet" media="screen, projection" type="text/css"
+          href="chrome://global/skin/dirListing/dirListing.css"/>
+    <script type="application/javascript;version=1.8"
+            src="chrome://syncorro/content/aboutSyncorro.js"/>
+  </head>
 
-.submitting {
-  background-image: url(chrome://global/skin/icons/loading_16.png);
-  background-repeat: no-repeat;
-  background-position: right;
-}
-</style>
-<title>Sync Error Reports</title>
-</head>
-<link rel="stylesheet" media="screen, projection" type="text/css"
-      href="chrome://global/skin/dirListing/dirListing.css"/>
-<script type="application/javascript;version=1.8"
-        src="chrome://syncorro/content/aboutSyncorro.js"/>
-<body onload="AboutSyncorro.init()" dir="&locale.dir;">
+  <body onload="AboutSyncorro.init()" dir="&locale.dir;" class="list-view">
+    <div id="list-reports">
+      <button chromedir="&locale.dir;"
+              id="clear-reports"
+              onclick="AboutSyncorro.clearReports()">&remove.all.reports;</button>
+      <h1>&sync.reports;</h1>
 
+      <table id="list-reports-table">
+        <thead>
+          <tr>
+            <th chromedir="&locale.dir;">&name;</th>
+            <th chromedir="&locale.dir;" colspan="2">&last.modified;</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+        </tbody>
+      </table>
 
-<div id="list.reports">
-<button chromedir="&locale.dir;"
-        id="clear-reports"
-        onclick="AboutSyncorro.clearReports()">Remove All Reports</button>
-<h1>Sync Reports</h1>
+      <p id="list-reports-none">&no.reports.found;</p>
+    </div>
 
-<table id="list.reports.table">
-  <thead>
-    <tr>
-      <th chromedir="&locale.dir;">Reports</th>
-      <th chromedir="&locale.dir;" colspan="2">Date</th>
-    </tr>
-  </thead>
-  <tbody id="tbody">
-  </tbody>
-</table>
+    <div id="view-report">
+      <h1>&view.report.details; <span id="view-report-date"/> <span id="view-report-time"/></h1>
 
-<p id="list.reports.none">Oh noez, there are no reportz.</p>
-</div>
+      <p id="view-report-notSubmittedYet">&ask.to.submit;</p>
 
-<div id="view.report">
+      <p id="view-report-submitted">&report.submitted;</p>
 
-<h1>Details for Sync problem on <span id="view.report.date"/>
-<span id="view.report.time"/></h1>
+      <!--<p id="view-report-solutionFound">&solution.found;
+      <a id="viewSupportPage" href="">&view.support.page;</a></p>-->
 
-<p id="view.report.notSubmittedYet">To help Mozilla improve Sync
-and prevent errors like this in the future, please submit this
-report. Your personal data will not be submitted.</p>
+      <p>
+        <input type="checkbox"
+               id="view-report-autoSubmit"
+               value="true"
+               checked="checked"/>
+        <label for="view-report-autoSubmit">&auto.submit;</label>
+      </p>
 
-<p id="view.report.submitted">Firefox submitted a report of the
-problem to Mozilla.</p>
+      <button chromedir="&locale.dir;"
+              id="view-report-submitButton"
+              onclick="AboutSyncorro.submitReport();">&submit.report;</button>
 
-<p id="view.report.solutionFound">Good news! Firefox submitted a
-report of the problem to Mozilla and a possible solution was found.
-<a id="viewSupportPage" href="">View support page</a></p>
+      <details>
+        <summary><h2 onclick="AboutSyncorro.details(this)">&full.report; <span class="details-closed">&show;</span><span class="details-open">&hide;</span></h2></summary>
+        <div id="full-report">
+          <p>&report.id; <span id="full-report-uuid"/></p>
 
-<p>
-  <input type="checkbox"
-         id="view.report.autoSubmit"
-         value="true"
-         checked="checked"/>
-  <label for="view.report.autoSubmit">Automatically submit reports
-  in the future</label>
-</p>
+          <details>
+            <summary><h3 onclick="AboutSyncorro.details(this)">&app.details; <span class="details-closed">&show;</span><span class="details-open">&hide;</span></h3></summary>
+            <table id="full-report-app">
+              <tr>
+                <td>&application;</td>
+                <td id="full-report-app-product"></td>
+              </tr>
+              <tr>
+                <td>&version;</td>
+                <td id="full-report-app-version"></td>
+              </tr>
+              <tr>
+                <td>&build.id;</td>
+                <td id="full-report-app-buildID"></td>
+              </tr>
+              <tr>
+                <td>&locale;</td>
+                <td id="full-report-app-locale"></td>
+              </tr>
+              <tr>
+                <td>&addons;</td>
+                <td id="full-report-app-addons">
+                  <ul>
+                  </ul>
+                </td>
+              </tr>
+            </table>
+          </details>
 
-<button chromedir="&locale.dir;"
-        id="view.report.submitButton"
-        onclick="AboutSyncorro.submitReport();">Submit report</button>
+          <details>
+            <summary><h3 onclick="AboutSyncorro.details(this)">&sync.account.info; <span class="details-closed">&show;</span><span class="details-open">&hide;</span></h3></summary>
+            <table id="full-report-sync">
+              <tr>
+                <td>&version;</td>
+                <td id="full-report-sync-version"></td>
+              </tr>
+              <tr>
+                <td>&account;</td>
+                <td id="full-report-sync-account"></td>
+              </tr>
+              <tr>
+                <td>&node;</td>
+                <td id="full-report-sync-cluster"></td>
+              </tr>
+              <tr>
+                <td>&enabled.engines;</td>
+                <td id="full-report-sync-engines">
+                  <ul></ul>
+                </td>
+              </tr>
+              <tr>
+                <td>&no.of.clients;</td>
+                <td id="full-report-sync-numClients"></td>
+              </tr>
+              <tr>
+                <td>&mobile.clients;</td>
+                <td id="full-report-sync-hasMobile"></td>
+              </tr>
+            </table>
+          </details>
 
-<h2>Full report <a onclick="AboutSyncorro.toggle(this, 'full.report')">(show)</a></h2>
+          <details>
+            <summary><h3 onclick="AboutSyncorro.details(this)">&error.fingerprint; <span class="details-closed">&show;</span><span class="details-open">&hide;</span></h3></summary>
+            <div id="full-report-error"></div>
+          </details>
 
-<div id="full.report" style="display: none;">
-
-<p>Report ID: <span id="full.report.uuid"/></p>
-
-<h3>Application details <a onclick="AboutSyncorro.toggle(this, 'full.report.app')">(show)</a></h3>
-
-<table id="full.report.app" style="display: none;">
-  <tr>
-    <td>Application</td>
-    <td id="full.report.app.product"></td>
-  </tr>
-  <tr>
-    <td>Version</td>
-    <td id="full.report.app.version"></td>
-  </tr>
-  <tr>
-    <td>Build ID</td>
-    <td id="full.report.app.buildID"></td>
-  </tr>
-  <tr>
-    <td>Locale</td>
-    <td id="full.report.app.locale"></td>
-  </tr>
-  <tr>
-    <td>Add-ons</td>
-    <td id="full.report.app.addons">
-      <ul>
-      </ul>
-    </td>
-  </tr>
-</table>
-
-<h3>Sync account info <a onclick="AboutSyncorro.toggle(this, 'full.report.sync')">(show)</a></h3>
-
-<table id="full.report.sync" style="display: none;">
-  <tr>
-    <td>Version</td>
-    <td id="full.report.sync.version"></td>
-  </tr>
-  <tr>
-    <td>Account</td>
-    <td id="full.report.sync.account"></td>
-  </tr>
-  <tr>
-    <td>Node</td>
-    <td id="full.report.sync.cluster"></td>
-  </tr>
-  <tr>
-    <td>Enabled engines</td>
-    <td id="full.report.sync.engines">
-      <ul></ul>
-    </td>
-  </tr>
-  <tr>
-    <td>Number of clients</td>
-    <td id="full.report.sync.numClients"></td>
-  </tr>
-  <tr>
-    <td>Mobile clients</td>
-    <td id="full.report.sync.hasMobile"></td>
-  </tr>
-</table>
-
-<h3>Error fingerprint <a onclick="AboutSyncorro.toggle(this, 'full.report.error')">(show)</a></h3>
-
-<div id="full.report.error" style="display: none;">
-</div>
-
-<h3>Log <a onclick="AboutSyncorro.toggle(this, 'full.report.log')">(show)</a></h3>
-
-<pre id="full.report.log" style="display: none;">
-</pre>
-
-</div>
-
-</div>
-
-</body>
+          <details id="full-report-wrapper">
+            <summary><h3 onclick="AboutSyncorro.details(this)">&log; <span class="details-closed">&show;</span><span class="details-open">&hide;</span></h3></summary>
+            <div id="full-report-shadow"></div>
+            <pre id="full-report-log"></pre>
+          </details>
+        </div>
+      </details>
+    </div>
+  </body>
 </html>
