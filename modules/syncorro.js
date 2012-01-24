@@ -231,7 +231,7 @@ const Syncorro = {
     let reports = [];
 
     if (!dir.exists()) {
-      callback(reports);  // no reports generated as of yet
+      callback(reports);  // There are no reports generated as of yet.
       return;
     }
 
@@ -259,7 +259,11 @@ const Syncorro = {
   clearReports: function clearReports(callback) {
     let dir = FileUtils.getDir("ProfD", ["weave", "syncorro"]);
     if (dir.exists()) {
-      dir.remove(true);
+      try {
+        dir.remove(true);
+      } catch(ex) {
+        this._log.error("Error attempting to remove syncorro logs directory.");
+      }
     }
 
     callback();

@@ -28,10 +28,6 @@ function startup(data, reason) {
   // Register the resource:// and chrome:// aliases.
   gResProtocolHandler.setSubstitution(RESOURCE_HOST, data.resourceURI);
 
-  if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0) {
-    Components.manager.addBootstrappedManifestLocation(data.installPath);
-  }
-
   Cu.import("resource://syncorro/modules/syncorro.js");
   for (let [name, value] in Iterator(DEFAULT_PREFS)) {
     SyncorroDefaultPrefs.set(name, value);
@@ -47,10 +43,6 @@ function shutdown(data, reason) {
 
   AboutSyncorro.unload();
   Syncorro.unload();
-
-  if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0) {
-    Components.manager.removeBootstrappedManifestLocation(data.installPath);
-  }
 
   Cu.unload("resource://syncorro/modules/syncorro.js");
   gResProtocolHandler.setSubstitution(RESOURCE_HOST, null);
