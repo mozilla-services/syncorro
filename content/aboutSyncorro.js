@@ -1,39 +1,12 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * Version: MPL 1.1/GPL 2.0/LGPL 2.1
- *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is Syncorro.
- *
- * The Initial Developer of the Original Code is
- * the Mozilla Foundation.
- * Portions created by the Initial Developer are Copyright (C) 2011
- * the Initial Developer. All Rights Reserved.
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. 
  *
  * Contributor(s):
  *   Philipp von Weitershausen <philipp@weitershausen.de>
+ *   Mime Cuvalo <mime@mozilla.com>
  *
- * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the MPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the MPL, the GPL or the LGPL.
- *
- * ***** END LICENSE BLOCK ***** */
+ */
 
 const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
 
@@ -77,10 +50,6 @@ function setList(id, array) {
   cell.appendChild(list);
 }
 
-function show(id, shouldShow) {
-  document.getElementById(id).style.display = shouldShow ? "block" : "none";
-}
-
 const AboutSyncorro = {
 
   init: function init() {
@@ -101,19 +70,15 @@ const AboutSyncorro = {
 
   showReportList: function showReportList() {
     Syncorro.listSavedReports(function (reports) {
-      show("view.report", false);
-      show("list.reports", true);
+      document.body.classList.add('list-view');
 
       if (!reports.length) {
-        show("list.reports.table", false);
-        show("list.reports.none", true);
+        document.body.classList.add('no-reports');
         return;
       }
+      document.body.classList.remove('no-reports');
 
-      show("list.reports.table", true);
-      show("list.reports.none", false);
-
-      let table = document.getElementById("list.reports.table");
+      let table = document.getElementById("list-reports-table");
       let tbody = document.getElementById("tbody");
       table.removeChild(tbody);
       tbody = document.createElement("tbody");
@@ -145,59 +110,67 @@ const AboutSyncorro = {
   },
 
   clearReports: function clearReports() {
-    //TODO
+    Syncorro.clearReports(function() {
+      document.body.classList.add('list-view');
+      document.body.classList.add('no-reports');
+    });
   },
 
   showReport: function showReport(uuid) {
     Syncorro.getReport(uuid, function (report) {
       if (!report) {
         // Uh-oh. Something went wrong.
-        alert("Oh noez, report not foundz.");//XXX TODO
+        document.body.classList.add('list-view');
+        document.body.classList.add('no-reports');
         return;
       }
 
+      document.body.classList.remove('list-view');
+
       let date = new Date(report.timestamp);
-      setText("view.report.date", formatDate(date));
-      setText("view.report.time", formatTime(date));
+      setText("view-report-date", formatDate(date));
+      setText("view-report-time", formatTime(date));
 
-      setText("full.report.uuid", report.uuid);
+      setText("full-report-uuid", report.uuid);
 
-      setText("full.report.app.product", report.app.product);
-      setText("full.report.app.version", report.app.version);
-      setText("full.report.app.buildID", report.app.buildID);
-      setText("full.report.app.locale",  report.app.locale);
-      setList("full.report.app.addons",  report.app.addons);
+      setText("full-report-app-product", report.app.product);
+      setText("full-report-app-version", report.app.version);
+      setText("full-report-app-buildID", report.app.buildID);
+      setText("full-report-app-locale",  report.app.locale);
+      setList("full-report-app-addons",  report.app.addons);
 
-      setText("full.report.sync.version", report.sync.version);
-      setText("full.report.sync.account", report.sync.account);
-      setText("full.report.sync.cluster", report.sync.cluster);
-      setList("full.report.sync.engines", report.sync.engines);
-      setText("full.report.sync.numClients", report.sync.numClients);
-      setText("full.report.sync.hasMobile",  report.sync.hasMobile); //TODO
+      setText("full-report-sync-version", report.sync.version);
+      setText("full-report-sync-account", report.sync.account);
+      setText("full-report-sync-cluster", report.sync.cluster);
+      setList("full-report-sync-engines", report.sync.engines);
+      setText("full-report-sync-numClients", report.sync.numClients);
+      setText("full-report-sync-hasMobile",  report.sync.hasMobile); //TODO
 
-      setText("full.report.error", JSON.stringify(report.error)); //TODO
-      setText("full.report.log", report.log);      
+      setText("full-report-error", JSON.stringify(report.errors)); //TODO
+      setText("full-report-log", report.log);
 
-      show("view.report.submitted", report.submitted);
-      show("view.report.notSubmittedYet", !report.submitted);
-      show("view.report.submitButton", !report.submitted);
+      if (report.submitted) {
+        document.getElementById("view-report").classList.add('report-submitted');
+      } else {
+        document.getElementById("view-report").classList.remove('report-submitted')
+      }
 
       //TODO
-      show("view.report.solutionFound", false);
-
-      show("list.reports", false);
-      show("view.report", true);
+      //show("view-report-solutionFound", false);
     });
   },
 
-  toggle: function toggle(button, id) {
-    let element = document.getElementById(id);
-    if (!element.style.display || element.style.display == "block") {
-      element.style.display = "none";
-      button.textContent = "(show)";
-    } else {
-      element.style.display = "block";
-      button.textContent = "(hide)";
+  details: function details(el) {
+    while (el) {
+      if (el.nodeName == 'details') {
+        if (el.hasAttribute('open')) {
+          el.removeAttribute('open');
+        } else {
+          el.setAttribute('open', '');
+        }
+        break;
+      }
+      el = el.parentNode;
     }
   }
 
